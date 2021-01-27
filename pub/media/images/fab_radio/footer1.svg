@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'>
+<svg enable-background="new 0 0 900 174.5" version="1.1" viewBox="0 0 900 174.5" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+<linearGradient id="e" x1="7.2247" x2="900" y1="87.252" y2="87.252" gradientUnits="userSpaceOnUse">
+	<stop stop-color="#CA3749" offset="0"/>
+	<stop stop-color="#D51141" offset=".2527"/>
+	<stop stop-color="#CD003D" offset=".4677"/>
+	<stop stop-color="#C50038" offset=".7527"/>
+	<stop stop-color="#B80035" offset="1"/>
+</linearGradient>
+<path d="m7.2 58.8v115.7h892.8v-174.5s-162.1 86.9-400.6 64.7c0 0-33.3-3.9-82.3-14.4-0.1 0-192.9-66-409.9 8.5z" fill="url(#e)"/>
+<linearGradient id="d" x1="-9.001e-8" x2="105.67" y1="106.78" y2="106.78" gradientUnits="userSpaceOnUse">
+	<stop stop-color="#FD4D3B" offset="0"/>
+	<stop stop-color="#F7463E" offset="1"/>
+</linearGradient>
+<path d="m66.2 39s43.2 68.3 39.3 135.5h-105.5v-116.5s41.7-13.9 66.2-19z" fill="url(#d)"/>
+<linearGradient id="c" x1="63.061" x2="379.89" y1="98.928" y2="98.928" gradientUnits="userSpaceOnUse">
+	<stop stop-color="#FD5030" offset="0"/>
+	<stop stop-color="#F74732" offset=".2204"/>
+	<stop stop-color="#F33133" offset=".5591"/>
+	<stop stop-color="#EA2F36" offset=".7366"/>
+	<stop stop-color="#E00644" offset="1"/>
+</linearGradient>
+<path d="m215.1 23.4s136.5 13.9 164.8 151.1h-277.6s7.8-56.2-39.3-134.5c0.1 0 52.1-15.8 152.1-16.6z" fill="url(#c)"/>
+<linearGradient id="b" x1="694.78" x2="900" y1="87.252" y2="87.252" gradientUnits="userSpaceOnUse">
+	<stop stop-color="#AD0033" offset="0"/>
+	<stop stop-color="#9F003A" offset=".5215"/>
+	<stop stop-color="#940039" offset="1"/>
+</linearGradient>
+<path d="m694.8 60 126.7 114.5h78.5v-174.5s-73.1 40.6-205.2 60z" fill="url(#b)"/>
+<linearGradient id="a" x1="213.33" x2="822.84" y1="98.928" y2="98.928" gradientUnits="userSpaceOnUse">
+	<stop stop-color="#CA3749" offset="0"/>
+	<stop stop-color="#D51141" offset=".2527"/>
+	<stop stop-color="#CD003D" offset=".4677"/>
+	<stop stop-color="#C50038" offset=".7527"/>
+	<stop stop-color="#B80035" offset="1"/>
+</linearGradient>
+<path d="m213.3 23.4s131.8 6.5 167.9 151.1h441.6l-126.7-114.5s-147.6 25.8-285.8-12.2c0 0-81-25.6-197-24.4z" fill="url(#a)"/>
+</svg>
