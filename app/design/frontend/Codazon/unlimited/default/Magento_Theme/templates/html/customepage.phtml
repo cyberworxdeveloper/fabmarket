@@ -1,0 +1,44 @@
+<?php
+echo $this->getLayout()
+          ->createBlock('Cyberworx\Newshows\Block\Index')
+          ->setTemplate('Cyberworx_Newshows::index.phtml')
+          ->toHtml();
+/*echo $this->getLayout()
+          ->createBlock('Magento\Catalog\Block\Product\ListProduct')
+          ->setTemplate('Codazon_ProductFilter::grid-style-17.phtml')
+          ->toHtml(); */
+		  
+?>
+<h1>Popular Shows</h1>
+<?php
+echo $this->getLayout()
+          ->createBlock('Cyberworx\Popularshow\Block\Index')
+          ->setTemplate('Cyberworx_Popularshow::index.phtml')
+          ->toHtml();
+?>
+<h1>Recommended Shows </h1>
+<?php
+echo $this->getLayout()
+          ->createBlock('Cyberworx\Rshow\Block\Index')
+          ->setTemplate('Cyberworx_Rshow::index.phtml')
+          ->toHtml();
+?>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+if($customerSession->isLoggedIn()) {  
+?>
+<h1>Browsing History </h1>
+<?php
+echo $this->getLayout()
+          ->createBlock('Cyberworx\Recentlyviewed\Block\Index')
+          ->setTemplate('Cyberworx_Recentlyviewed::index.phtml')
+          ->toHtml();
+		  ?>
+<?php } ?>
+<?php
+/*echo $this->getLayout()
+          ->createBlock('Cyberworx\Recentlyviewed\Block\Index')
+          ->setTemplate('Cyberworx_Recentlyviewed::index.phtml')
+          ->toHtml();*/
+?>

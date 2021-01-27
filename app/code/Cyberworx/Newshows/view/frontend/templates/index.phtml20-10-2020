@@ -1,0 +1,88 @@
+<div class="product_slider">
+<div class="owl-carousel owl-theme products product-items">
+<?php
+$productCollection = $block->getProductCollection();
+foreach ($productCollection as $product) 
+{
+	 $pid=$product->getId();	
+	$pvisibility=$product->getVisibility();	
+	$_mySampleaudio = $block->getSampleCollection($pid); 
+	if($product->getSpecialPrice()>0)
+	{
+		$price= number_format($product->getSpecialPrice(),2);
+	}else
+	{
+		$price= number_format($product->getPrice(),2);
+	}
+	if($product->getName()!="" && $pvisibility==4){
+?>
+<div class="new_product_box">
+<div class="new_custom_product_img_box product-item-top">
+	<img src="pub/media/images/play-icon.svg" width="65" height="65" alt="audio plyer" class="play play_audio" data-audio="<?php echo $pid."-".$_mySampleaudio; ?>">
+	<a href="/<?php echo $product->getUrlKey(); ?>" >
+	<img src="http://3.6.21.143/pub/media/catalog/product<?php echo $product->getSmallImage(); ?>" />
+	<p><?php echo $product->getName(); ?></p>
+	</a>
+	<div class="button-top-wrap">
+	<a href="<?php echo $block->getUrl('wishlist', ['_secure' => true]);?><img src="<?php echo $block->getViewFileUrl('images/wish_icon.jpg'); ?>" data-post='<?php  echo $this->helper('Magento\Wishlist\Helper\Data')->getAddParams($product) ?>' class="action towishlist" data-action="add-to-wishlist"><span>' . __('Add to Wish List') . '</span></a>
+</div>
+</div>
+<div class="new_custom_product_desp_box">
+	<div class="product_desp"><?php echo $product->getShortDescription(); ?></div>
+	<div class="product_price_"><?php echo "$".$price; ?> <span>onwards</span></div>
+</div>
+
+</div>
+
+
+	
+    
+<?php
+}
+	//print_r($product->getData());     
+    //echo "<br>"; 
+} 
+?>
+</div>
+</div>
+<script>
+require(['jquery','owlcarousel'], function($){
+$('.product-items').owlCarousel({ 
+loop:true, 
+autoplay:true,
+margin:30,
+dots:false, 
+nav:true, 
+responsive:{ 
+0:{ 
+items:1,
+dots:false,
+}, 
+600:{ 
+items:2.5,
+dots:false, 
+}, 
+1280:{ 
+items:3.5,
+dots:false, 
+},
+1366:{ 
+items:4.5,
+dots:false, 
+},
+1420:{ 
+items:4.5,
+dots:false,
+},
+1600:{ 
+items:5.5,
+dots:false,
+},
+1900:{ 
+items:5.5,
+dots:false,
+}
+} 
+});  
+}); 
+   </script>

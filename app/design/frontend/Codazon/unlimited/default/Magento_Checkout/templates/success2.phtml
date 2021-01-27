@@ -1,0 +1,156 @@
+<div class="thank-you-page">
+   <img src="<?php echo $block->getBaseUrl(); ?>pub/media/images/thankyou.png" class="thank-img">
+<?php if ($block->getOrderId()) {?>
+   <h1 class="page-title">
+      <span class="base" data-ui-id="page-title-wrapper">Order #<?php echo $block->getOrderId();?></span>
+   </h1>
+
+			
+		<?php
+			 $lid =$block->getOrderId();
+			$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+			$order = $objectManager->create('Magento\Sales\Model\Order')->loadByIncrementId($lid);
+
+			$totall = $order->getGrandTotal();
+	
+	
+
+
+		$items = $order->getAllVisibleItems();
+		foreach($items as $i)
+		{
+			$product = $objectManager->create('Magento\Catalog\Model\Product')->load($i->getProductId());
+			$sku = $product->getSku();
+			//echo "product sku:".$_product."<br/>";
+		     $imageUrl = $product->getMediaConfig()->getMediaUrl($product->getImage());
+		?>	
+			
+  <div class="item">
+	   <div class="img-box-success">
+			<img class="success-photo" src="<?php echo $imageUrl;?>" width="10%">
+	   </div>
+	   <div class="text-box">
+			<span><?php echo $product->getName();?></span>
+			<!--<p> You can cancel your subscription anytime </p>-->
+	   </div>
+	  
+	   <div class="download-link text-box">
+		   <span><a href="<?php echo $this->getUrl('sales/order/view/order_id/'.$order->getId())?>"><i class="fa fa-download"></i> Download</a></span>
+	   </div>
+   </div>
+		
+
+		
+		
+		<?php
+		
+		}
+
+
+	
+	?>
+		
+	
+		
+		
+   
+   <h4 class="sub-title-2">We have sent you the download link in your registered Email.</h4> 
+	
+   <div class="bill-summary">
+    <div class="summry_head">
+		<div><h1>Bill Summary</h1></div>
+		<div><p>Order #<?php echo $lid;?></p></div>
+		<div><p><?php $order->getCreatedAt();?></p></div>
+		<div class="last"><p><a href="#" download><i class="fa fa-download"></i> Dowmload PDF Receipt</a></p></div>
+   </div>
+   <table class="table">
+       <!--<thead>
+        	<tr>
+        		<td><h1>Bill Summary</h1></td>
+        		<td><p>Order #<?php //echo $lid;?></p></td>
+        		<td><p><?php// $order->getCreatedAt();?></p></td>
+        		<td><p><i class="fa fa-download"></i> Dowmload PDF Receipt</p></td>
+        	</tr>
+    	</thead>-->
+    	<tbody>
+		<?php
+			
+			foreach($items as $i)
+				{
+				$product = $objectManager->create('Magento\Catalog\Model\Product')->load($i->getProductId());
+			?>
+    	<tr>
+    		<td><b><?php echo $product->getName();?></b> <span>#<?php echo $lid;?></span></td>
+    		<td>&nbsp;</td>
+    		<td>&nbsp;</td>
+    		<td>$<?php 
+				if($product->getSpecialPrice()>0)
+				{
+				echo number_format($product->getSpecialPrice(),2);
+				}else
+				{
+					echo number_format($product->getPrice(),2);
+				}
+				?></td>
+    	</tr>
+			<?php
+			}
+			?>
+		
+		
+        <tr>
+    		<td style="padding-top: 30px !IMPORTANT;"><b>Subtotal (<?php echo count($items)?> items):</b></td>
+    		<td>&nbsp;</td>
+    		<td>&nbsp;</td>
+    		<td style="padding-top: 30px !IMPORTANT;">$<?php echo $order->getSubtotal();?></td>
+        </tr>
+			
+			<?php
+			if($order->getDiscountAmount()>0)
+			{
+			?>
+        <tr>
+    		<td class="text-red">Discount Amount: <span class="box"><?php echo $order->getCouponCode();?></span></td>
+    		<td>&nbsp;</td>
+    		<td>&nbsp;</td>
+    		<td class="text-red">-$<?php echo number_format($order->getDiscountAmount(),2);?></td>
+    	</tr>
+			<?php
+			}
+			?>
+			<?php
+			if($order->getTaxAmount()>0)
+			{
+			?>
+			<tr>
+    		<td class="text-red"><b>Tax Amount:</b></td>
+    		<td>&nbsp;</td>
+    		<td>&nbsp;</td>
+    		<td class="text-red">-$<?php echo number_format($order->getTaxAmount(),2);?></td>
+    	</tr>
+			<?php
+			}
+			?>
+    	<tr>
+    		<td><b>Total:</b></td>
+    		<td>&nbsp;</td>
+    		<td>&nbsp;</td>
+    		<td>$<?php echo number_format($totall,2);?></td>
+    	</tr>
+    	
+    	</tbody>
+    </table>
+   </div>
+
+	<?php
+		}
+	?>
+	
+	
+   
+   <div class="col-md-24 text-center Continue">
+        <a class="action continue" href="<?= $block->escapeUrl($block->getContinueUrl()) ?>" title="Continue Shopping">
+           <span><?= $block->escapeHtml(__('Continue Shopping')) ?></span>
+        </a>
+   </div>
+</div>

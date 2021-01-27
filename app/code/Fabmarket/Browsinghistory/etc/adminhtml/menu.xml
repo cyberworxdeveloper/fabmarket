@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Fabmarket. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Backend/etc/menu.xsd">
+    <menu>
+        <add id="Fabmarket_Browsinghistory::fabmarket_index_index" title="Browsinghistory" module="Fabmarket_Browsinghistory"  sortOrder="20" dependsOnModule="Fabmarket_Browsinghistory" action="browsinghistory/index/index" resource="Fabmarket_Browsinghistory::fabmarket_index_index"/>
+<!--AddMenu-->
+    </menu>
+</config>

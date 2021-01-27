@@ -1,0 +1,663 @@
+<?php
+ $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+ $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+ $connection = $resource->getConnection();
+ $tableName = $resource->getTableName('downloadable_link_purchased_item');
+  $productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+
+
+
+$_order = $block->getOrder();
+//print_r($_order);
+//echo "stst".$_order->getId();
+ $reserved_order_id=$_order->getRealOrderId();
+//echo "stst".$_order->getStatusLabel();
+
+
+$mytable = $resource->getTableName('mg_quote');
+$sql = "SELECT * FROM " . $mytable." where reserved_order_id=".$reserved_order_id;
+
+$result = $connection->fetchAll($sql); 
+
+$entity_id=$result[0]['entity_id'];
+$customerSession = $objectManager->get('Magento\Customer\Model\Session'); 
+$customerid = $customerSession->getCustomer()->getId();
+
+$sqlquery = "SELECT * FROM mg_subscribedetails_index where quoteid=".$entity_id ." AND customerid=".$customerid." AND flag=2";
+
+$resultarray = $connection->fetchAll($sqlquery); 
+/*echo "<pre>";
+print_r($resultarray);
+die("working");*/
+$epsodearray=[];
+$epsodearray1=[];
+foreach($resultarray as $rrow)
+{
+	$epsodearray[$rrow['produtid']]['produtid']=$rrow['produtid'];
+	$epsodearray[$rrow['produtid']]['noofepisode']=$rrow['noofepisode'];
+	$epsodearray[$rrow['produtid']]['customerid']=$rrow['customerid'];
+	$newDatearr=explode(" ",$rrow['nextepisodedate']);
+	$newDate = $newDatearr[0];
+	$epsodearray[$rrow['produtid']]['nextepisodedate']=$newDate;
+	$epsodearray[$rrow['produtid']]['subscription_end_date']=$rrow['subscription_end_date'];
+	//$epsodearray1[]=$epsodearray;
+}
+/*echo "<pre>";
+print_r($epsodearray);
+die("hi");*/
+/*$produtid=$resultarray[0]['produtid'];
+$noofepisode=$resultarray[0]['noofepisode'];
+$customerid=$resultarray[0]['customerid'];
+$todaydate = date('Y-m-d');
+$nextepisodedate=$resultarray[0]['nextepisodedate'];
+$newDatearr=explode(" ",$nextepisodedate);
+$newDate = $newDatearr[0]; */
+?>
+<h1 class="page-title-top"> Purchase History</h1>
+<div class="row history_tab">
+   <div class="service_tab">
+      <ul>
+         <li class="fab_tab active" data="active_subcription">Active Purchase</li>
+         <!--<li class="fab_tab" data="past_purchase">Past Purchase</li>-->
+      </ul>
+   </div>
+   <div class="container-custom">
+       
+      <div class="fab_tab_content active" data="active_subcription" target="active_subcription">
+         <div class="fab_section">
+            <div class="row fab_tab_show">
+    <?php 
+	$lk=1;
+	foreach ($_order->getAllVisibleItems() as $_item) {
+	
+
+		 $productId = $block->escapeHtml($_item->getProductId());
+
+		// select query
+	
+		$query= "Select order_item_id,link_hash,link_id,product_id,link_title FROM $tableName where order_item_id='".$_item->getId()."' and product_id='".$productId."' " ;
+		$result = $connection->fetchAll($query);
+		$totalordercount=count($result);
+		//print_r($result);
+		//die("hi");
+		/*custom code*/
+		
+		//print_r($epsodearray[$productId]);
+	//	die("present");	
+		$imagewidth=50;
+		$imageheight=50;
+		$product = $objectManager->get('\Magento\Catalog\Model\Product')->load($productId);
+		$imageHelper  = $objectManager->get('\Magento\Catalog\Helper\Image');
+		$image_url = $imageHelper->init($product, 'product_page_image_small')->setImageFile($product->getFile())->resize($imagewidth, $imageheight)->getUrl();
+		//echo $image_url;
+		//die("working");
+		$customOptions = $objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($product);
+		$total_bite=0;
+		$i=1;
+		$pname="";
+		$skuarray=array();
+		foreach($customOptions as $opt)
+		{
+			$total_bite=count($opt->getValues());				
+			foreach($opt->getValues() as $value) {
+				$val=$value->getData('sku');
+				$skuarray[$i]=$val;	
+				$i++;
+			}
+		}	
+		
+		$restepisode=$total_bite-$totalordercount;
+		
+		$newarrays=array();
+		$finalarray=[];
+		for($x=1;$x<=$restepisode;$x++)
+		{
+			//$linkurl=array();
+			//if($total_bite>=$noofepisode)
+			//{
+				$nextsku=$skuarray[$totalordercount+$x];
+				
+				$productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+				$productObj = $productRepository->get($nextsku);
+				
+				if ($productObj->getExtensionAttributes() && $productObj->getExtensionAttributes()->getDownloadableProductLinks()) {
+					foreach ($productObj->getExtensionAttributes()->getDownloadableProductLinks() as $links) {
+						$linksData[] = $links->getData();
+					}
+				   }
+				  // echo "<pre>";
+				  // print_r($linksData);
+				  // die();
+				   $linkcount=count($linksData);
+				  /* for($lc=0;$lc<$linkcount;$lc++)
+				   {
+					   $linkurl[]=$linksData[$lc]['link_url'];
+				   }*/
+					$linkurl=$linksData[$linkcount-1]['link_url'];
+					
+					$newarrays['linkurl']=$linkurl;
+					$newarrays['ProductUrl']=$productObj->getProductUrl();
+					$newarrays['pname']=$productObj->getName();
+					$newarrays['pid']=$productObj->getId();
+					$newarrays['pdesc']=$productObj->getDescription();
+					$finalarray[]=$newarrays;
+					 //echo "<pre>";
+					//print_r($newarrays);
+					
+					//echo "===>".$ProductUrl=$productObj->getProductUrl();
+					//echo "===>".$pname=$productObj->getName();
+					//echo "===>".$pid=$productObj->getId();
+					//echo "===>".$pdesc=$productObj->getDescription();
+
+			//die("hi");
+			//}
+		 }
+		/*echo "<pre>";
+		print_r($epsodearray);
+		die("hi11");*/
+		/*custom code*/
+	 
+
+$imagewidth=200;
+$imageheight=200;
+
+$product_ = $objectManager->create('Magento\Catalog\Model\Product')->load($productId); 
+$imageHelper  = $objectManager->get('\Magento\Catalog\Helper\Image');
+$image_url = $imageHelper->init($product_, 'product_page_image_small')->setImageFile($product_->getFile())->resize($imagewidth, $imageheight)->getUrl();
+
+
+                        ?>
+                
+             <div class="fab_episode_block">
+			 <span class="number"><?php echo $lk ;?></span>
+                  <div class="pro_img">
+                     <a href="#"><img src="<?php  echo $image_url ?>"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head"><b><?php        
+          						 echo $block->escapeHtml($_item->getName());
+     							?> 
+						 </b><span>|  Created Date:  <?= /* @noEscape */ $block->formatDate($_order->getCreatedAt()) ?> </span></p>
+					  <!--  | Renewal Date: 17/12/2019  -->
+                     <div class="season_content">
+                         <?php echo $product_->getDescription(); ?>
+                     </div>
+                       <?php  $content_frequency= $product_->getResource()->getAttribute('content_frequency')->getFrontend()->getValue($product_);
+                     if($content_frequency !=''){
+                     ?>
+                     <p class="wish_price">Content Frequency: <?php echo $content_frequency ?><span></span></p>
+                     <?php } ?>
+                    <!-- <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19 | <b>Next date of delivery: 10/01/20</b></span>
+                        </span>
+                     </div>-->
+                  </div>
+                <!--  <form data-role="tocart-form" action="<?php echo $block->getBaseUrl(); ?>checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Download all</span>
+                        </button>
+                     </div>
+                  </form>-->
+               </div>
+				
+			<?php
+			if($_order->getStatusLabel()!='Pending')
+			{
+			?>
+			<div calss="row">
+                   <div class="col-md-24">
+                       <div class="faq-page">
+                        <div class="tabs">
+                           <div class="row">
+                              <div class="col-sm-24 col-xs-24">
+                                  
+                                        <div class="tab">
+											
+											 <input id="tab<?php echo $productId ?>" name="rd" type="radio"> 
+											 <div class="other_order_view_row">
+											 <label class="tab-label" for="tab<?php echo $productId ?>">Detail</label>
+											 </div>
+											
+											<a href="#"><i class="fa fa-download"></i> Download</a>
+                                    <div class="tab-content">
+                                        <ul>
+										<li>
+                                                    
+													<?php 
+													$currentdate=date("Y-m-d");
+													//echo "==>".$productId;
+												if(isset($epsodearray[$productId]))
+												{
+													//echo $epsodearray[$productId]['subscription_end_date'];
+													//die("working");
+													/*if($currentdate<=$epsodearray[$productId]['subscription_end_date'])
+													{*/
+														$epsodearray[$productId]['nextepisodedate'];
+														$epno=1;
+														$totalepisodeno=$epsodearray[$productId]['noofepisode'];
+													
+														if($epsodearray[$productId]['nextepisodedate']==$currentdate)
+														{
+															//die("hi");
+													
+														if(count($finalarray)>0) {
+														//$ab=$totalepisodeno-1;
+														//$abc=array_chunk($finalarray,$ab);
+														//print_r($abc);
+														//die("hi");
+														//echo "<pre>";
+														$farray=array();
+														foreach($finalarray as $finalrow)
+														{
+															if($epno<$totalepisodeno)
+															{
+																$farray[]=$finalrow;
+																$epno++;
+															}
+														}
+													$revfinalarray=array_reverse($farray);
+											
+														foreach($revfinalarray as $finalrow)
+														{
+															//if($epno<$totalepisodeno)
+															//{
+															?>
+														<div class="row">
+														 <div class="col-md-16">
+															<p><?php echo $finalrow['pname']; ?></p>
+													   <!--p><img width="50px" height="50px" src="<?php //echo $image_url; ?>"/></p-->
+													   <div class="pr_detail"><p><?php echo $finalrow['pdesc']; ?></p></div>
+													   </div>
+													  
+													    <div class="col-md-8">
+                                                        <a href="javascript:void(0)" onclick="downloadepisode('<?php echo base64_encode($finalrow['linkurl']); ?>')"><i class="fa fa-download"></i> Download </a>
+                                                    </div>
+													    </div>
+													<?php	
+															//$epno++;
+															//}
+															}
+															}
+														}
+														else
+														{
+															/*echo "<pre>";
+															echo $productId;
+															print_r($epsodearray);
+															print_r($finalarray);*/
+															$fsarray=array();
+															if(isset($epsodearray[$productId]))
+															{
+																$epsn=1;
+															$totalepisodeno=$epsodearray[$productId]['noofepisode'];
+															
+															if(count($finalarray)>0) 
+															{ 
+																$farray=array();
+																foreach($finalarray as $finalrow)
+																{
+																	//echo $epsn;
+																	//echo $totalepisodeno;
+																	//print_r($finalrow);
+																	//die("hhhh");
+																	if($epsn<$totalepisodeno)
+																	{
+																		$fsarray[]=$finalrow;
+																		$epsn++;
+																	}
+																}
+																//print_r($fsarray);
+																//die("present");
+															$rev_finalarray=array_reverse($fsarray);
+																foreach($rev_finalarray as $finalrow)
+																{
+																	//if($epsn<$totalepisodeno)
+																	//{
+																		//echo "less";
+																		?>
+																		<div class="row">
+																		 <div class="col-md-16">
+																			<p><?php echo $finalrow['pname']; ?></p>
+																	   <!--p><img width="50px" height="50px" src="<?php //echo $image_url; ?>"/></p-->
+																	   <div class="pr_detail"><p><?php echo $finalrow['pdesc']; ?></p></div>
+																	   </div>
+																	  
+																		<div class="col-md-8">
+																		<a href="javascript:void(0)" onclick="downloadepisode('<?php echo base64_encode($finalrow['linkurl']); ?>')"><i class="fa fa-download"></i> Download </a>
+																	</div>
+																		</div>
+																		<?php
+																		//$epsn++;
+																	//}
+																	
+																}
+															}
+																
+															}
+															
+															
+														}
+													//}
+													}
+													?>
+														<?php /*if(isset($pname) && $pname!=""){ ?>
+														<p><?php echo $pname; ?></p>
+													   <p><img width="50px" height="50px" src="<?php echo $image_url; ?>"/></p>
+													   
+													   <p><?php echo $pdesc; ?></p>
+													   
+													   <?php } ?>
+													   
+													</div>
+													<?php if(isset($linkurl)){ ?>
+													 <div class="col-md-8">
+                                                        <a href="javascript:void(0)" onclick="downloadepisode('<?php echo base64_encode($linkurl); ?>')"><i class="fa fa-download"></i> Download </a>
+                                                    </div>
+													<?php } */?>
+											</div>
+										</li>
+                                        <?php
+										
+	foreach($result as $key=>$val)
+											{
+												//echo "====>".$val['link_hash'];
+                                                	$link_sku= $val['link_title'];
+                                        	?>
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-md-16">
+                                                        <p><?php echo $val['link_title'];?></p>
+
+<?php 
+   $productId = 579;
+   $objectManager =  \Magento\Framework\App\ObjectManager::getInstance();
+   $currentproduct = $objectManager->create('Magento\Catalog\Model\Product')->load($productId);
+//print_r($currentproduct);
+
+?><?php //echo $currentproduct->getDescription(); ?>
+<div class="pr_detail">
+														
+														<?php
+												try{
+														$product = $productRepository->get($link_sku);
+														echo $product->getShortDescription();
+													}catch (\Magento\Framework\Exception\NoSuchEntityException $e){
+															// insert your error handling here
+														}
+														?>
+													
+													
+													</div>
+                                                    </div>
+
+
+                                                    
+
+                                                    <div class="col-md-8">
+                                                        <a href="<?php echo $this->getUrl('downloadable/download/link', ['id' => $val['link_hash'], '_secure' => true]);?>" download><i class="fa fa-download"></i> Download </a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                     	<?php
+											}
+											?>
+                                        </ul>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                   </div>
+               </div>
+			<?php
+			}?>
+<!--			
+ <?php 
+$product = $objectManager->get('\Magento\Catalog\Model\Product')->load($productId);
+$customOptions = $objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($product);
+$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+
+if(count($customOptions)>0)
+{
+?>
+               
+               
+               <div calss="row">
+                   <div class="col-md-24">
+                       <div class="faq-page">
+                        <div class="tabs">
+                           <div class="row">
+                              <div class="col-sm-24 col-xs-24">
+                                  
+                                  <?php					  
+
+ $i=1;
+
+foreach ($customOptions as $option) {
+
+	$opt=$option->getData();
+	$title=$opt['default_title'];
+	$id=$opt['option_id'];
+	?>
+
+	
+                                 <div class="tab">
+                                    <input id="tab<?php echo $i ?>" name="rd" type="radio"> <label class="tab-label" for="tab<?php echo $i ?>"><?php echo $title;?></label><a href="#"><i class="fa fa-download"></i> Download</a>
+                                    <div class="tab-content">
+                                        <ul>
+                                        <?php
+                                       
+                                        	foreach ($option->getValues() as $value) {
+                                        	$val=$value->getData();
+							     	$productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+							         	$productlist = $productRepository->get($val['sku']);
+
+                                        	?>
+											
+											
+											
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-md-16">
+                                                        <p><?php echo $productlist->getName().$productlist->getId();?></p>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <a href="#"><i class="fa fa-download"></i> Download</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                     	<?php
+								
+							
+
+						}
+						?>
+                                        </ul>
+                                    </div>
+                                 </div>
+                               <?php
+    $i++;   }
+
+?>  
+                               
+                               
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                   </div>
+               </div>
+               <?php  } ?>
+				
+-->				
+				
+				
+               <?php $lk++;  }  ?>
+            </div>
+         </div>
+      </div>
+      
+      
+      
+      
+      
+      
+      
+      <div class="fab_tab_content" data="past_purchase" target="past_purchase">
+         <div class="fab_section">
+            <div class="row">
+               <div class="fab_episode_block">
+                  <div class="num"><b>1.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="<?php echo $block->getBaseUrl(); ?>pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="<?php echo $block->getBaseUrl(); ?>checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+               <div class="fab_episode_block">
+                  <div class="num"><b>2.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="<?php echo $block->getBaseUrl(); ?>pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="<?php echo $block->getBaseUrl(); ?>checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+                 <div class="fab_episode_block">
+                  <div class="num"><b>3.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="<?php echo $block->getBaseUrl(); ?>pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="<?php echo $block->getBaseUrl(); ?>checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+                 <div class="fab_episode_block">
+                  <div class="num"><b>4.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="<?php echo $block->getBaseUrl(); ?>pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="<?php echo $block->getBaseUrl(); ?>checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+                 <div class="fab_episode_block">
+                  <div class="num"><b>5.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="<?php echo $block->getBaseUrl(); ?>pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="<?php echo $block->getBaseUrl(); ?>checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<script>
+function downloadepisode(linkurl)
+{
+	window.location.href = "http://3.6.21.143/downloadepisode/index/index?id="+linkurl;
+}
+/*function downloadepisode(linkurl)
+{
+	require(['jquery'], function($){
+	alert(linkurl);
+	$.ajax({
+	    url : "http://3.6.21.143/downloadepisode/index/index",
+		method: "POST",
+	    data : {linkurls:linkurl},
+	    success: function(data)
+	    {
+		
+	},
+	});
+	});
+}*/
+
+</script>

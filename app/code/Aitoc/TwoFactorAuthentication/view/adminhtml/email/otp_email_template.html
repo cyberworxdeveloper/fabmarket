@@ -1,0 +1,72 @@
+<!--@subject {{trans "One Time Password for %name" name=$user.name}} @-->
+<!--@vars {
+"var user.name":"Account Holder Name"
+} @-->
+<html><head>
+		<title>Login OTP</title>
+		<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet">
+	</head>
+	<body style="font-family: 'Nunito Sans', sans-serif;margin: 0;background: #ececec;">
+		<div class="div1" style="
+    width: 650px;
+    margin: 0 auto;
+    background: #fff;
+	padding:30px;
+	box-sizing:border-box;
+">
+			<div class="div2" style="
+    background-image: url(https://www.fabmarket.in/pub/media/mailer-image/header_bg.jpg);
+    background-size: cover;
+    margin: -30px -30px 0 -30px;
+    padding-top: 30px;
+    text-align: center;
+    padding-bottom: 100px;
+">
+				<img src="https://www.fabmarket.in/pub/media/logo/default/FAB-Logo3.jpg" style="
+    width: 210px;
+    position: relative;
+    z-index: 99;
+    margin: 0 auto;
+    display: block;
+">
+
+<h1 style="
+    margin: 50px 0 10px 0;
+    color: #3e3d3d;
+">Hi {{trans "%name," name=$user.name}}</h1>
+<p style="
+    margin: 0;
+">There was recently a request to generate one-time password for your account.</p>
+			</div>
+			<div class="div3">
+		
+			<p style="
+    text-align: center;
+    font-size: 21px;
+    margin-top: 40px;
+    ">Password will be valid for a short time.</p>
+
+			<p style="
+    text-align: center;
+	    font-size: 21px;
+">Your OTP: <b>{{var password}}</b></p>
+			
+
+			<h3 style="
+    text-align: center;
+    color: #cf4347;
+    font-size: 20px;
+">Thank You</h3>
+			</div>
+			<div class="div4" style="background-image:url(https://www.fabmarket.in/pub/media/mailer-image/footer1.png);background-size: cover;padding: 90px 0 30px 0;margin: 0 -30px -30px -30px;text-align: center;box-sizing: border-box;">
+				<p style="
+    margin: 0;
+    font-size: 14px;
+    color: rgb(255, 255, 255);
+    padding-top: 0;
+    box-sizing: border-box;
+">Copyright © HTmedia. All Rights Reserved</p>
+			</div>
+		</div>
+	
+</body></html>

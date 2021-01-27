@@ -1,0 +1,75 @@
+<div class="credit-card">
+    <img src="<?php echo $block->getBaseUrl(); ?>pub/media/images/payment-card.png"> Please note that this payment can be only completed via <strong> Credit Card</strong>
+</div>
+<div class="agree">
+    <p><input class="proceed_line" type="checkbox"> By clicking proceed to pay, you agree to our <a target="_blank" href="<?php echo $block->getBaseUrl(); ?>terms-and-condition/">Terms and condition</a> and that you have read our <a target="_blank" href="<?php echo $block->getBaseUrl(); ?>privacy-policy/"> privacy policy</a>, including our <a target="_blank" href="<?php echo $block->getBaseUrl(); ?>privacy-policy/">cookie</a> use</p>
+</div>
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Checkout\Block\Onepage\Link */
+?>
+<?php if ($block->isPossibleOnepageCheckout()) :?>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+if($customerSession->isLoggedIn()) {
+?>
+    <button type="button" disabled 
+            data-role="proceed-to-checkout"
+            title="<?= $block->escapeHtmlAttr(__('Proceed to Pay')) ?>"
+            data-mage-init='{
+                "Magento_Checkout/js/proceed-to-checkout":{
+                    "checkoutUrl":"<?= $block->escapeJs($block->escapeUrl($block->getCheckoutUrl())) ?>"
+                }
+            }'
+            class="action primary cart_diabled_btn checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
+            <?php if ($block->isDisabled()) :?>
+                disabled="disabled"
+            <?php endif; ?>>
+        <span><?= $block->escapeHtml(__('Proceed to Pay')) ?></span>
+    </button>
+   <?php }else {   ?>
+    <button type="button" class="fab_button cart_diabled_btn customer-login-link" disabled data="login">Proceed to Pay</button>
+    <?php } ?>
+<?php endif?>
+<div class="col-md-24 text-center Continue">
+<a class="action continue" href="<?php echo $block->getBaseUrl(); ?>" title="Continue Shopping">
+   <span>Continue Shopping <i class="fa fa-chevron-right"></i></span>
+</a>
+</div>
+
+
+<script>
+require([
+	'jquery',
+	'mage/mage'
+], function ($) { 
+
+
+   $(document).ready(function(){ 
+   $(".proceed_line").click(function(){
+           $(this).addClass("checked");
+           if($(".cart_diabled_btn").is(":disabled")){
+           $(".cart_diabled_btn").prop("disabled",false);
+           }else{
+               $(".cart_diabled_btn").prop("disabled",true);
+           }
+          
+       });
+	   
+	   
+	   $(".cart-title-click").click(function(){
+		   
+		   $(this).find('.cart-episode').toggle();
+				
+						
+				});
+	   
+	   
+});
+});
+</script> 

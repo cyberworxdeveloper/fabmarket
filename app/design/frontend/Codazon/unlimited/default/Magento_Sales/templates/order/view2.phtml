@@ -1,0 +1,373 @@
+<?php
+ $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+ $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+ $connection = $resource->getConnection();
+ $tableName = $resource->getTableName('downloadable_link_purchased_item');
+ $productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+
+
+
+$_order = $block->getOrder();
+
+//echo "stst".$_order->getStatusLabel();
+
+?>
+<h1 class="page-title-top"> Purchase History</h1>
+<div class="row history_tab">
+   <div class="service_tab">
+      <ul>
+         <li class="fab_tab active" data="active_subcription">Active Subcription</li>
+         <!--<li class="fab_tab" data="past_purchase">Past Purchase</li>-->
+      </ul>
+   </div>
+   <div class="container-custom">
+       
+    
+       
+      <div class="fab_tab_content active" data="active_subcription" target="active_subcription">
+         <div class="fab_section">
+            <div class="row fab_tab_show">
+    <?php foreach ($_order->getAllVisibleItems() as $_item) {
+	
+
+		 $productId = $block->escapeHtml($_item->getProductId());
+
+		// select query
+	
+		$query= "Select order_item_id,link_hash,link_id,product_id,link_title FROM $tableName where order_item_id='".$_item->getId()."' and product_id='".$productId."' " ;
+		$result = $connection->fetchAll($query);
+	
+	 
+
+$imagewidth=200;
+$imageheight=200;
+
+$product_ = $objectManager->create('Magento\Catalog\Model\Product')->load($productId); 
+$imageHelper  = $objectManager->get('\Magento\Catalog\Helper\Image');
+$image_url = $imageHelper->init($product_, 'product_page_image_small')->setImageFile($product_->getFile())->resize($imagewidth, $imageheight)->getUrl();
+
+                        ?>
+                
+             <div class="fab_episode_block">
+                  <div class="pro_img">
+                     <a href="#"><img src="<?php  echo $image_url ?>"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head"><b><?php        
+          						 echo $block->escapeHtml($_item->getName());
+     							?> 
+						 </b><span>|  Created Date:  <?= /* @noEscape */ $block->formatDate($_order->getCreatedAt()) ?> </span></p>
+					  <!--  | Renewal Date: 17/12/2019  -->
+                     <div class="season_content">
+                         <p><?php echo $product_->getDescription(); ?></p>
+                     </div>
+                       <?php  $content_frequency= $product_->getResource()->getAttribute('content_frequency')->getFrontend()->getValue($product_);
+                     if($content_frequency !=''){
+                     ?>
+                     <p class="wish_price">Content Frequency: <?php echo $content_frequency ?><span></span></p>
+                     <?php } ?>
+                    <!-- <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19 | <b>Next date of delivery: 10/01/20</b></span>
+                        </span>
+                     </div>-->
+                  </div>
+                <!--  <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Download all</span>
+                        </button>
+                     </div>
+                  </form>-->
+               </div>
+				
+			<?php
+			if($_order->getStatusLabel()!='Pending')
+			{
+			?>
+			<div calss="row">
+                   <div class="col-md-24">
+                       <div class="faq-page">
+                        <div class="tabs">
+                           <div class="row">
+                              <div class="col-sm-24 col-xs-24">
+                                  
+                                        <div class="tab">
+											
+											 <input id="tab<?php echo $productId ?>" name="rd" type="radio"> 
+											<label class="tab-label" for="tab<?php echo $productId ?>">Detail</label>
+											<a href="#"><i class="fa fa-download"></i> Download</a>
+                                    <div class="tab-content">
+                                        <ul>
+                                        <?php
+                                       		
+                                        	foreach($result as $key=>$val)
+											{
+											$link_sku= $val['link_title'];
+												
+												
+											
+												
+												
+                                        	?>
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-md-16">
+                                                        <p><?php echo $val['link_title'];?></p>
+                                                    </div>
+													<div class="pr_detail">
+														
+														<?php
+												try{
+														$product = $productRepository->get($link_sku);
+														echo $product->getShortDescription();
+													}catch (\Magento\Framework\Exception\NoSuchEntityException $e){
+															// insert your error handling here
+														}
+														?>
+													
+													
+													</div>
+                                                    <div class="col-md-8">
+                                                        <a href="<?php echo $this->getUrl('downloadable/download/link', ['id' => $val['link_hash'], '_secure' => true]);?>" target="_blank"><i class="fa fa-download"></i> Download</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                     	<?php
+											}
+											?>
+                                        </ul>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                   </div>
+               </div>
+			<?php
+			}?>
+<!--			
+ <?php 
+$product = $objectManager->get('\Magento\Catalog\Model\Product')->load($productId);
+$customOptions = $objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($product);
+$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface');
+
+if(count($customOptions)>0)
+{
+?>
+               
+               
+               <div calss="row">
+                   <div class="col-md-24">
+                       <div class="faq-page">
+                        <div class="tabs">
+                           <div class="row">
+                              <div class="col-sm-24 col-xs-24">
+                                  
+                                  <?php					  
+
+ $i=1;
+
+foreach ($customOptions as $option) {
+
+	$opt=$option->getData();
+	$title=$opt['default_title'];
+	$id=$opt['option_id'];
+	?>
+
+	
+                                 <div class="tab">
+                                    <input id="tab<?php echo $i ?>" name="rd" type="radio"> <label class="tab-label" for="tab<?php echo $i ?>"><?php echo $title;?></label><a href="#"><i class="fa fa-download"></i> Download</a>
+                                    <div class="tab-content">
+                                        <ul>
+                                        <?php
+                                       
+                                        	foreach ($option->getValues() as $value) {
+                                        	$val=$value->getData();
+							     	$productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+							         	$productlist = $productRepository->get($val['sku']);
+
+                                        	?>
+											
+											
+											
+                                            <li>
+                                                <div class="row">
+                                                    <div class="col-md-16">
+                                                        <p><?php echo $productlist->getName().$productlist->getId();?></p>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <a href="#"><i class="fa fa-download"></i> Download</a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                     	<?php
+								
+							
+
+						}
+						?>
+                                        </ul>
+                                    </div>
+                                 </div>
+                               <?php
+    $i++;   }
+
+?>  
+                               
+                               
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                   </div>
+               </div>
+               <?php } ?>
+				
+-->				
+				
+               <?php } ?>
+            </div>
+         </div>
+      </div>
+      
+      
+      
+      
+      
+      
+      
+      <div class="fab_tab_content" data="past_purchase" target="past_purchase">
+         <div class="fab_section">
+            <div class="row">
+               <div class="fab_episode_block">
+                  <div class="num"><b>1.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+               <div class="fab_episode_block">
+                  <div class="num"><b>2.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+                 <div class="fab_episode_block">
+                  <div class="num"><b>3.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+                 <div class="fab_episode_block">
+                  <div class="num"><b>4.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+                 <div class="fab_episode_block">
+                  <div class="num"><b>5.</b></div>
+                  <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/r/a/ramayan_1.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">Charlie Chikna <span>Last Bought: 17/12/2019</span></p>
+                     <div class="season_content">
+                        <p>While residing in the haunted mansion along with parents Hugh and Olivia, and his younger siblings Shirley, Theo, Nell and Luke. During their stay, the Crain family encounters paranormal</p>
+                     </div>
+                     <p class="wish_price">Content Frequency: Monthly<span></span></p>
+                     <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19</span>
+                        </span>
+                     </div>
+                  </div>
+                  <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

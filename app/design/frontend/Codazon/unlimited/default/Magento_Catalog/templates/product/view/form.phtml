@@ -1,0 +1,230 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * Product view template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View
+ */
+?>
+<?php $_helper = $this->helper('Magento\Catalog\Helper\Output'); ?>
+<?php $_product = $block->getProduct(); ?>
+<?php
+$showFormTag = true;
+if ($wrapper = $this->getLayout()->getBlock('product.form.wrapper')) {
+    $filterTypes = ['bundle', 'downloadable'];
+    $showFormTag = !$wrapper->getData('show_form_tag');
+}
+?>
+
+<div class="product-add-form">
+    <?php if ($showFormTag) : ?>
+    <form data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>" action="<?php /* @escapeNotVerified */ echo $block->getSubmitUrl($_product) ?>" method="post"
+          id="product_addtocart_form"<?php if ($_product->getOptions()): ?> enctype="multipart/form-data"<?php endif; ?>>
+    <?php endif ?>
+        <input type="hidden" name="product" value="<?php /* @escapeNotVerified */ echo $_product->getId() ?>" />
+        <input type="hidden" name="selected_configurable_option" value="" />
+        <input type="hidden" name="related_product" id="related-products-field" value="" />
+        <input type="hidden" name="item"  value="<?= (int)$block->getRequest()->getParam('id') ?>" />
+        <?php echo $block->getBlockHtml('formkey')?>
+        <?php echo $block->getChildHtml('form_top'); ?>
+        <?php if ($wrapper) : ?>
+        <?php echo $block->getChildHtml('form_middle'); ?>
+        <?php else : ?>
+        <?php if (!$block->hasOptions()):?>
+            <?php echo $block->getChildHtml('product_info_form_content'); ?>
+        <?php else:?>
+            <?php if ($_product->isSaleable() && $block->getOptionsContainer() == 'container1'):?>
+                <?php echo $block->getChildChildHtml('options_container') ?>
+            <?php endif;?>
+        <?php endif; ?>
+        <?php if ($_product->isSaleable() && $block->hasOptions() && $block->getOptionsContainer() == 'container2'):?>
+            <?php echo $block->getChildChildHtml('options_container') ?>
+        <?php endif;?>
+        <?php endif ?>
+        <?php echo $block->getChildHtml('form_bottom'); ?>
+    <?php if ($showFormTag) : ?>
+    </form>
+    <?php endif ?>
+</div>
+<?php if ($showFormTag) : ?>
+<script>
+    require([
+        'jquery',
+        'priceBox'
+    ], function($){
+        var dataPriceBoxSelector = '[data-role=priceBox]',
+            dataProductIdSelector = '[data-product-id=<?php echo $block->escapeHtml($_product->getId())?>]',
+            priceBoxes = $(dataPriceBoxSelector + dataProductIdSelector);
+
+        priceBoxes = priceBoxes.filter(function(index, elem){
+            return !$(elem).find('.price-from').length;
+        });
+
+        priceBoxes.priceBox({'priceConfig': <?php /* @escapeNotVerified */ echo $block->getJsonConfig() ?>});
+    });
+</script>
+<?php endif ?>
+
+<div >
+<?php
+			$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+			$customOptions = $objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($_product);
+			$total_bite=0;
+			foreach($customOptions as $opt)
+			{
+				$total_bite=count($opt->getValues());
+			}
+			$listBlock = $objectManager->get('\Magento\Catalog\Block\Product\ListProduct');
+			$addToCartUrl =  $listBlock->getAddToCartUrl($_product);
+			
+		?>
+		<?php 
+			//print_r($_product->getData('subscription_option'));
+			//die("working");
+		?>
+		<?php if($_product->getData('subscription_option')==5472){ ?>
+			<form data-role="tocart-form" action="<?php echo $addToCartUrl; ?>" method="post"> 
+			<?php echo $block->getBlockHtml('formkey')?>		
+			<div class="fab_subscription_box detail sub_check" style="width:350px;">
+                                                               <?php $con_frequency= $_product->getAttributeText('content_frequency'); ?>
+                                                                   <?php  if ($con_frequency !='' ){ ?>
+						<p class="sml_heading text-left">Subscribe &amp; Save</p>
+						<hr>
+						
+						<p>Frequency of episode delivery : Once a <lowercase><?php echo $_product->getAttributeText('content_frequency'); ?></lowercase></p>
+						
+						<ul class="subscription_detail wd100">
+							
+							<?php $five_month= $_product['five_month'];
+                                                                                 if($five_month !='') {
+                                                                                    ?>
+							<li class="">
+								<input type="radio" id="male" name="subscribe" value="five_month">
+								<div class="subs_block">
+									<div class="month">
+										<span class="fab_checkbox"></span>
+										<p><b>12</b></p>
+										<p>Months</p>
+									</div>
+									<div class="price">
+										<p><b>$<?php echo $_product['five_month']; ?></b></p>
+										<p><strike></strike></p>
+									</div>
+								</div>
+							</li>
+
+							       <?php }
+                                                                                 $three_month= $_product['three_month'];
+                                                                                 if($three_month !='') {
+                                                                                    ?>
+
+							
+								<li class="">
+							<input type="radio" id="female" name="subscribe" value="three_month">
+								<div class="subs_block">
+									<div class="month">
+										<span class="fab_checkbox"></span>
+										<p><b>06</b></p>
+										<p>Months</p>
+									</div>
+									<div class="price">
+										<p><b>$<?php echo $_product['three_month']; ?></b></p>
+										<p><strike></strike></p>
+									</div>
+								</div>
+							</li>
+							<?php }
+                                                                                 $one_month= $_product['one_month'];
+                                                                                 if($one_month !='') {
+                                                                                    ?>
+
+							<li class="">
+							<input type="radio" id="other" name="subscribe" value="one_month">
+								<div class="subs_block">
+									<div class="month">
+										<span class="fab_checkbox"></span>
+										<p><b>01</b></p>
+										<p>Month</p>
+									</div>
+									<div class="price">
+										<p><b>$<?php echo $_product['one_month']; ?></b></p>
+										<p><strike></strike></p>
+									</div>
+								</div>
+							</li>
+                                                                                   <?php }
+                                                                                    ?>
+
+						</ul>
+						
+						<button type="submit" id="subscribeaddtocart" class="fab-btn" disabled>Start Subscription</button>
+						<?php  } else {
+
+echo "<p>Content frequency is not set</p>";
+
+} ?>
+						<div class="" data="1year">
+							<!--You can cancel anytime during the free trial period. You will only be charged once free trial period expires.-->
+						</div>
+						
+					</div>
+
+			
+			<!---<input type="radio" id="male" name="subscribe" value="one_month">
+			<label for="onemonth">One Month</label><br>
+			<input type="radio" id="female" name="subscribe" value="three_month">
+			<label for="threemonth">Three Month</label><br>
+			<input type="radio" id="other" name="subscribe" value="five_month">
+			<label for="fivemonth">Five Month</label>-->
+			<input type="hidden" id="noofepisode" name="noofepisode" value="<?php echo $total_bite ?>">
+			
+			<!--<div class="btn">
+				<button type="submit" id="subscribeaddtocart" title="Add to Cart" class="action tocart primary">
+					<span>Add to Cart</span>
+				</button>
+			</div>  --> 
+			</form>
+			<span id="subscribemessage"></span>
+		<?php } ?>
+</div>
+<script>
+    require([
+        'jquery'
+       
+    ], function($){		
+		$.ajax({  
+			type: 'POST',  
+			url: 'http://lykanmedia.com/subscribedetails/index/index', 
+			data: { product_id: "<?php echo $_product->getId()?>"},
+			success: function(data) {	
+				//alert(data);			
+				//alert("present");			
+				//setTimeout(function(){ 
+				if(data=="yes")
+				{
+					$("#product-addtocart-button").attr("style", "display: none !important");
+					$("#subscribeaddtocart").attr("style", "display: none !important");
+					$("#subscribemessage").text("Already subscribed and added in the cart!");
+				}
+				
+				
+			}
+		});
+		
+		$(".sub_check li").click(function(){
+			$(this).addClass("checked");
+			$(this).siblings().removeClass("checked");
+			$(this).find("input").prop("checked",true);
+			$("#subscribeaddtocart").removeAttr("disabled");
+            // this.querySelector('[name="subs"]').checked = true;
+		});
+		
+		
+    });
+</script>

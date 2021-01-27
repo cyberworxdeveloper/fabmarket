@@ -1,0 +1,445 @@
+
+<?php 
+$_orders = $block->getOrders(); 
+?>
+
+<?= $block->getChildHtml('info') ?>
+<h1 class="page-title-top"> Purchase History</h1>
+<div class="row history_tab">
+   <div class="service_tab">
+      <ul>
+         <li class="fab_tab active" data="active_subscription">Active  Purchase</li>
+         <!--<li class="fab_tab" data="past_purchase">Past Purchase</li>-->
+      </ul>
+   </div>
+	<?php 
+$p=1;
+ $p= $_GET['p'];?>
+	<?php if(count($_orders->getData())==0){ ?>
+<div class="fab_tab_content active" data="active_subscription" target="active_subscription">
+         <div class="fab_section">
+            <div class="row">
+			<p style="font-weight: 600;">No product in your account</p>
+			<p><a href="http://lykanmedia.com/" style="    position: absolute; background: #cf4347; color: #fff; padding: 6px 20px; border-radius: 50px;font-size: 15px; font-weight: 600; letter-spacing: 0;top: 45px;">Purchase Now</a></p>
+			</div></div></div>
+<?php } else{ ?>
+
+      <div class="fab_tab_content active" data="active_subscription" target="active_subscription">
+         <div class="fab_section">
+            <div class="row">
+                
+                <?php 
+if($p>1){
+$s= $p-1;
+           $i=1 * 10 * $s +1 ;     
+}else{
+    $i=1;
+}
+
+                foreach ($_orders as $_order) : ?> 
+ <?php $label = $_order->getStatusLabel(); ?> 
+               <div class="fab_episode_block">
+                  <div class="num"> <?php echo $i; ?>. <a href="<?= $block->escapeUrl($block->getViewUrl($_order)) ?>" class="orderid">Order Id: <?= $block->escapeHtml($_order->getRealOrderId()) ?></a> </div>
+                  <div class="history_block_order">
+                        <?php foreach ($_order->getAllVisibleItems() as $_item) {
+                                  $productId = $block->escapeHtml($_item->getProductId());
+
+
+
+$subs=$_item['product_options'] ['info_buyRequest'];
+$arr = array('subscribe' => NULL);
+
+$imagewidth=200;
+$imageheight=200;
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$product_ = $objectManager->create('Magento\Catalog\Model\Product')->load($productId); 
+ $imageHelper  = $objectManager->get('\Magento\Catalog\Helper\Image');
+$image_url = $imageHelper->init($product_, 'product_page_image_small')->setImageFile($product_->getFile())->resize($imagewidth, $imageheight)->getUrl();
+
+                        ?>
+                  <div class="history_left_sec">
+                       <div class="pro_img">
+                     <a href="<?= $block->escapeUrl($block->getViewUrl($_order)) ?>"><img src="<?php  echo $image_url ?>"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">
+           <?php        
+           echo $block->escapeHtml($_item->getName());
+     ?>
+                 <span>Purchase Date: <?=  $block->formatDate($_order->getCreatedAt()) ?> </span>
+				 
+				 <?php if(array_key_exists('subscribe', $subs)){ ?>
+             <span class="subscription_msg_box green">Subscribed</span>
+<?php } ?>
+
+</p>
+
+
+                     <div class="season_content">
+                        <?php echo $product_->getDescription(); ?>
+                     </div>
+                     <?php  $content_frequency= $product_->getResource()->getAttribute('content_frequency')->getFrontend()->getValue($product_);
+                     if($content_frequency !=''){
+                     ?>
+                     <p class="wish_price frequency">Content Frequency: <?php echo $content_frequency ?><span></span></p>
+                                     <?php } ?>
+                                       </div>
+                  </div>
+               <?php  } ?>
+					  
+		
+               <div class="pro_cart">
+				<div>
+				
+				<?php if($label =='Complete'){ ?>
+                        <button type="submit" title="View Details" class="fab-btn effect-1">
+                            <span><a  href="<?= $block->escapeUrl($block->getViewUrl($_order)) ?>">Download</a></span>
+                        </button>
+						 <ul class="more">
+                            <li class="more_links">More...
+                                <ul class="fab_more_menu">
+                                <li><a href="http://lykanmedia.com/invoice/index.php?order_id=<?= $block->escapeHtml($_order->getRealOrderId()) ?>">Download Invoice</a></li>
+                               <!-- <li><a href="javascript:void(0);" class="fab_popup_btn" data="cancel-subscription">Cancel Subscription</a></li>-->
+                                </ul>
+                            </li>
+                        </ul>
+				<?php } else { ?>
+				           <button type="submit" title="<?php echo $label ?>" disabled="disabled" class="fab-btn effect-1">
+                            <span><a  href="#">Download</a></span>
+                        </button>
+						 <ul disabled="disabled" class="more">
+                            <li class="more_links">More...
+                                <ul class="fab_more_menu">
+                                <li>Pending Invoice</li>
+                               <!-- <li><a href="javascript:void(0);" class="fab_popup_btn" data="cancel-subscription">Cancel Subscription</a></li>-->
+                                </ul>
+                            </li>
+                        </ul>
+				<?php } ?>
+                       
+
+                        </div>
+              </div>
+					  
+			
+                 </div>
+               </div>
+               
+                  <?php 
+                      $i++;
+                  endforeach; ?>
+               
+          
+               
+            
+          
+            </div>
+            </div>
+            </div>
+			<?php } ?>
+
+<style>
+
+.previous {
+  background-color: #f1f1f1;
+  color: black;
+}
+
+.next {
+  background-color: #4CAF50;
+  color: white;
+}
+
+
+.row.history_tab a.fab_btn.previous, .row.history_tab a.next.fab_btn {
+    background: #cf4347;
+    color: #fff;
+    padding: 10px 20px;
+    min-width: 120px;
+    text-align: center !important;
+    border-radius: 50px;
+    display: inline-block;
+    margin: 0 14px 0 0;
+    text-decoration: none;
+}
+
+
+
+
+.row.history_tab 
+ a.fab_btn.disabled {
+    pointer-events: none;
+    background: #ccc;
+    opacity: 0.9;
+}
+
+.row.history_tab a.fab_btn.previous:hover, .row.history_tab a.next.fab_btn:hover {
+    color: #fff !IMPORTANT;
+    background: #9f003a;
+}
+</style>
+<?php 
+
+$total= count($_orders->getData());
+?>
+<?php
+$prv=''; 
+if($p== '1'){
+$class='disabled';
+$prv= $p;
+}else{
+$prv= $p-1;
+$class="";
+}
+?>
+ <a class=" fab_btn previous <?php echo $class ?>" href="http://lykanmedia.com/sales/order/history/?p=<?php echo $prv; ?> "> &laquo; Previous</a>
+<?php if($total=='10'){
+$next=$p+1;
+ ?>
+ <a class="next fab_btn" href="http://lykanmedia.com/sales/order/history/?p=<?php echo $next; ?>"> Next &raquo;</a>
+<?php } else { ?>
+ <a class="next fab_btn" href="http://lykanmedia.com/sales/order/history/?p=1"> First Page &raquo;</a>
+<?php } ?>
+
+     <!-- <div class="fab_tab_content" data="past_purchase" target="past_purchase">
+         <div class="fab_section">
+            <div class="row">
+               <div class="fab_episode_block">
+                  <div class="history_block_order">
+				  
+                  <div class="num"><b>1.</b></div>
+                                          <div class="history_left_sec">
+                       <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/cache/b061dc0ed422bc5c1d8fd0b5595b5cb1/r/a/ramayan.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">
+           Ramayan                  <span>Start Date: 3/23/20 | Renewal Date: 17/12/2019</span></p>
+
+                     <div class="season_content">
+                        Ramayan is the mega epic that states that no matter what the truth always triumphs and darkness is always taken down by enlightenment. The epic that is so close to people’s heart was brought back to the people of the country through the audio medium by Ramayan.                     </div>
+                                          <p class="wish_price frequency">Content Frequency: Monthly<span></span></p>
+                     <p class="last_date_delivery">Last date of delivery: 10/12/19 | <span>Next date of delivery: 10/01/20</span></p>
+                                          <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19 |<span class="price">Next date od delivery: 10/01/20</span></span>
+                        </span>
+                     </div>
+                  </div>
+                  </div>
+                              <div class="pro_cart">
+                         <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+                        </div>
+                 </div>
+               </div>
+			    <div class="fab_episode_block">
+                  <div class="history_block_order">
+				  
+                  <div class="num"><b>2.</b></div>
+                                          <div class="history_left_sec">
+                       <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/cache/b061dc0ed422bc5c1d8fd0b5595b5cb1/r/a/ramayan.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">
+           Ramayan                  <span>Start Date: 3/23/20 | Renewal Date: 17/12/2019</span></p>
+
+                     <div class="season_content">
+                        Ramayan is the mega epic that states that no matter what the truth always triumphs and darkness is always taken down by enlightenment. The epic that is so close to people’s heart was brought back to the people of the country through the audio medium by Ramayan.                     </div>
+                                          <p class="wish_price frequency">Content Frequency: Monthly<span></span></p>
+                     <p class="last_date_delivery">Last date of delivery: 10/12/19 | <span>Next date of delivery: 10/01/20</span></p>
+                                          <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19 |<span class="price">Next date od delivery: 10/01/20</span></span>
+                        </span>
+                     </div>
+                  </div>
+                  </div>
+                              <div class="pro_cart">
+                         <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+                        </div>
+                 </div>
+               </div>
+			    <div class="fab_episode_block">
+                  <div class="history_block_order">
+				  
+                  <div class="num"><b>3.</b></div>
+                                          <div class="history_left_sec">
+                       <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/cache/b061dc0ed422bc5c1d8fd0b5595b5cb1/r/a/ramayan.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">
+           Ramayan                  <span>Start Date: 3/23/20 | Renewal Date: 17/12/2019</span></p>
+
+                     <div class="season_content">
+                        Ramayan is the mega epic that states that no matter what the truth always triumphs and darkness is always taken down by enlightenment. The epic that is so close to people’s heart was brought back to the people of the country through the audio medium by Ramayan.                     </div>
+                                          <p class="wish_price frequency">Content Frequency: Monthly<span></span></p>
+                     <p class="last_date_delivery">Last date of delivery: 10/12/19 | <span>Next date of delivery: 10/01/20</span></p>
+                                          <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19 |<span class="price">Next date od delivery: 10/01/20</span></span>
+                        </span>
+                     </div>
+                  </div>
+                  </div>
+                              <div class="pro_cart">
+                         <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+                        </div>
+                 </div>
+               </div>
+			    <div class="fab_episode_block">
+                  <div class="history_block_order">
+				  
+                  <div class="num"><b>4.</b></div>
+                                          <div class="history_left_sec">
+                       <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/cache/b061dc0ed422bc5c1d8fd0b5595b5cb1/r/a/ramayan.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">
+           Ramayan                  <span>Start Date: 3/23/20 | Renewal Date: 17/12/2019</span></p>
+
+                     <div class="season_content">
+                        Ramayan is the mega epic that states that no matter what the truth always triumphs and darkness is always taken down by enlightenment. The epic that is so close to people’s heart was brought back to the people of the country through the audio medium by Ramayan.                     </div>
+                                          <p class="wish_price frequency">Content Frequency: Monthly<span></span></p>
+                     <p class="last_date_delivery">Last date of delivery: 10/12/19 | <span>Next date of delivery: 10/01/20</span></p>
+                                          <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19 |<span class="price">Next date od delivery: 10/01/20</span></span>
+                        </span>
+                     </div>
+                  </div>
+                  </div>
+                              <div class="pro_cart">
+                         <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+                        </div>
+                 </div>
+               </div>
+			    <div class="fab_episode_block">
+                  <div class="history_block_order">
+				  
+                  <div class="num"><b>5.</b></div>
+                                          <div class="history_left_sec">
+                       <div class="pro_img">
+                     <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/cache/b061dc0ed422bc5c1d8fd0b5595b5cb1/r/a/ramayan.jpg"></a>
+                  </div>
+                  <div class="pro_content">
+                     <p class="sub_head">
+           Ramayan                  <span>Start Date: 3/23/20 | Renewal Date: 17/12/2019</span></p>
+
+                     <div class="season_content">
+                        Ramayan is the mega epic that states that no matter what the truth always triumphs and darkness is always taken down by enlightenment. The epic that is so close to people’s heart was brought back to the people of the country through the audio medium by Ramayan.                     </div>
+                                          <p class="wish_price frequency">Content Frequency: Monthly<span></span></p>
+                     <p class="last_date_delivery">Last date of delivery: 10/12/19 | <span>Next date of delivery: 10/01/20</span></p>
+                                          <div class="price-box price-final_price" data-role="priceBox" data-product-id="6" data-price-box="product-id-6">
+                        <span class="price-container price-final_price tax weee">
+                            <span id="product-price-6" data-price-amount="30" data-price-type="finalPrice" class="price-wrapper ">Last date of delivery: 10/12/19 |<span class="price">Next date od delivery: 10/01/20</span></span>
+                        </span>
+                     </div>
+                  </div>
+                  </div>
+                              <div class="pro_cart">
+                         <form data-role="tocart-form" action="http://www.rupinwadhwa.com/fab2/checkout/cart/add/uenc/aHR0cDovL3d3dy5ydXBpbndhZGh3YS5jb20vZmFiMi9yYW1heWFuLTEuaHRtbA%2C%2C/product/6/" method="post">
+                     <div class="pro_cart">
+                        <button type="submit" title="Add to Cart" class="fab-btn effect-2">
+                            <span>Buy Again</span>
+                        </button>
+                     </div>
+                  </form>
+                        </div>
+                 </div>
+               </div>
+              
+            </div>
+         </div>
+      </div>-->
+   </div>
+   
+   
+   
+   <div class="fab_popup_section cancel_subscription" data="cancel-subscription">
+		<div class="fab_popup_container">
+			<div class="fab_popup">
+				<i class="popup_close"></i>
+				<div class="logo_section">
+					<img src="http://www.rupinwadhwa.com/fab2/pub/media/logo/default/form_logo.png">
+					<p>Fever Audio Buzz</p>
+				</div>
+				<div class="fab_form_contain">
+				<form action="" method="POST">
+				<h2>Cancel Subscription</h2>
+					<p>If you cancel the subscription you will not receive any further content from us, are you sure you want to cancel?</p>
+					<div class="fab_form_box ">	
+						<button type="button" class="fab_input submit fab-btn popup_close">Skip</button>
+					
+						<p class="okay_cancel"><a href="#">Okay</a></p>
+					</div>
+				</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	require(['jquery'], function($){ 
+	    $(".fab_popup_btn").click(function(){
+		$("html, body").css("overflow","hidden");
+		var pn = $(this).attr("data");
+		$(".fab_popup_bg").fadeIn();
+		$(".fab_popup_section").each(function(){
+			var	gpn =  $(this).attr("data");
+			if(pn == gpn){
+				$(this).fadeIn();
+				$(this).addClass("show");
+			}else{
+				$(this).fadeOut();
+				$(this).removeClass("show");
+			}
+		});
+	});
+	
+	$(".popup_close").click(function(){
+		$("html, body").css("overflow-y","auto");
+		$(".fab_popup_bg").fadeOut();
+		$(".fab_popup_section").fadeOut();
+		setTimeout(function(){
+			$(".fab_popup_section").removeClass("show");
+		},500);
+	});
+	
+	$(".fab_popup_section").on('click', function (event) {
+      if (!$(event.target).closest('.fab_popup').length) {
+         $("html, body").css("overflow-y","auto");
+		$(".fab_popup_bg").fadeOut();
+		$(".fab_popup_section").fadeOut();
+		setTimeout(function(){
+			$(".fab_popup_section").removeClass("show");
+		},500);  
+      }
+    });
+	});
+	</script>

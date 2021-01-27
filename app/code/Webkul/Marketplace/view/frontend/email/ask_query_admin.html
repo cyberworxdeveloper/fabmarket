@@ -1,0 +1,139 @@
+<!--
+/**
+ * Webkul Software.
+ *
+ * @category  Webkul
+ * @package   Webkul_Marketplace
+ * @author    Webkul
+ * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+-->
+<!--@subject Seller Query  : {{var subject}}  @-->
+<!--@vars {
+"var this.getUrl($store, 'customer/account/')":"Customer Account URL",
+"var customer.email":"Customer Email",
+"var customer.name":"Customer Name"
+} @-->
+
+
+
+<!--<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans "%customer_name," customer_name=$myvar1}}</p>
+            <p>
+                {{trans "A question has been ask by seller please revert back to him as soon as possible."}}
+            </p>
+        </td>
+    </tr>
+    <tr class="email-information">
+        <td>
+            <table class="query-details">
+                <tr>
+                    <td class="query-details">
+                        <h3>{{trans "Seller's Name"}}</h3>
+                        <p>{{var myvar2|raw}}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="query-details">
+                        <h3>{{trans "Seller's Question"}}</h3>
+                        <p>{{var myvar3|raw}}</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>-->
+
+
+<html><head>
+	<title>Ask Query</title>
+</head>
+<body style="
+    margin: 0;
+    background: whitesmoke;
+    font-family: sans-serif;
+">
+<div class="mailer_body" style="
+    width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding-bottom: 50px;
+">
+	<div class="top_section" style="background-image:url(http://3.6.21.143/pub/media/mailer-image/vendor_header.jpg);height: 154px;border-bottom: 2px solid #dcdcdc;">
+		<div class="logo_box" style="
+    text-align: center;
+">
+		<img src="https://www.fabmarket.in/pub/media/logo/default/FAB-Logo3_427a0da7f8f2e776a6ea484887e22ccc.jpg" class="logo" style="
+    width: 172px;
+    margin: 10px 0 0 0;
+">
+		</div>
+	</div>
+	<div class="middle_section" style="
+    text-align: center;
+">
+		<h1 style="
+    margin: 30px 0 0 0;
+    color: #000;
+    font-size: 24px;
+">Hi Admin,</h1>
+		<p style="
+    color: #8f8f8f;
+    font-size: 16px;
+    margin: 10px 0 0 0;
+">A question has been ask by seller please revert back to him as soon as possible.</p>
+		<div class="info_box" style="
+    text-align: center;
+    margin: 30px 0 0 0;
+">
+			<table border="1px" align="center" width="60%" cellpadding="10px" style="
+    border-collapse: collapse;
+    font-size: 14px;
+    color: #8f8f8f;
+text-align:left;
+">
+				<tbody>
+				<tr>
+					<td width="120px" style="
+    background: #f8f8f8;
+">Seller's Name
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar2|raw}}				</td></tr>
+				<tr>
+					<td style="
+    background: #f8f8f8;
+">Seller's Question
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar3|raw}}
+
+				</td></tr>
+				
+			</tbody></table>
+		</div>
+		<p style="
+    color: #8f8f8f;
+    font-size: 16px;
+    margin: 20px 0 30px 0;
+">We request you to kindly take an action on the same.</p>
+		<a href="javascript:void(0)" style="
+    background: #c60039;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 60px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+">THANK YOU</a>
+	</div>
+</div>
+
+</body></html>
+
+

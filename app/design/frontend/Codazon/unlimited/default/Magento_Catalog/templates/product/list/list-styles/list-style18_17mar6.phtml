@@ -1,0 +1,554 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+use Magento\Framework\App\Action\Action;
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php if ($block->getMode() == 'grid') : ?>
+<?php
+/**
+ * Product list template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php
+$_productCollection = $block->getLoadedProductCollection();
+?>
+
+<?php if (!$_productCollection->count()): ?>
+    <div class="message info empty"><div><?= __('We can\'t find products matching the selection.') ?></div></div>
+<?php else: ?>
+<?php
+/* helper */
+$_helper = $this->helper('Magento\Catalog\Helper\Output');
+$imageHelper = $this->helper('Magento\Catalog\Helper\Image');
+$themeHelper = $this->helper('Codazon\ThemeLayoutPro\Helper\Data');
+$quickShopHelper = $this->helper('Codazon\QuickShop\Helper\Data');
+$compareHelper = $this->helper('Magento\Catalog\Helper\Product\Compare');
+$wishlistHelper = $this->helper('Magento\Wishlist\Helper\Data');
+$labelHelper = $this->helper('Codazon\ProductLabel\Helper\Data');
+
+/* layout */
+$layout = $themeHelper->getBlockPageLayout($block);
+
+/* show on list */
+$showDescription = $themeHelper->isDisplayOnList('description');
+$showSku = $themeHelper->isDisplayOnList('sku');
+$showWishlist = $themeHelper->isDisplayOnList('wishlist');
+$showCompare = $themeHelper->isDisplayOnList('compare');
+$showCart = $themeHelper->isDisplayOnList('addtocart');
+$showQuickShop = $themeHelper->isDisplayOnList('quickshop');
+$showLabel = $themeHelper->isDisplayOnList('label');
+$showThumb = $themeHelper->isDisplayOnList('thumb');
+$showName = $themeHelper->isDisplayOnList('name');
+$showReview = $themeHelper->isDisplayOnList('review');
+$showPrice = $themeHelper->isDisplayOnList('price');
+
+
+
+$width = $themeHelper->getConfig('images/category/product_image_width')?:150;
+$height = $themeHelper->getConfig('images/category/product_image_height')?:150;
+$paddingBottom = $height*100/$width;
+
+$cartWidget = $block->isRedirectToCartEnabled()?'':'data-mage-init=\'{"catalogAddToCart":{}}\'';
+
+?>
+
+
+<style type="text/css">
+<?= $themeHelper->getColumnStyle('.page-products .products-grid.ctst .product-items', '.page-products .products-grid.ctst .product-items .item.product-item', '.page-products .ctst .product-items .item.product-item', $layout); ?>
+</style>
+    <?= $block->getToolbarHtml() ?>
+    <?= $block->getAdditionalHtml() ?>
+    <?php
+	$viewMode = 'grid';
+	$image = 'category_page_grid';
+	$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+    $pos = $block->getPositioned();
+    $qtyValidator = $block->escapeHtml(json_encode($themeHelper->getQuantityValidators()));
+    ?>
+    
+    
+    <?= $block->getToolbarHtml() ?>
+<?php endif; ?>
+<?php else : ?>
+<?php echo $this->setTemplate('Magento_Catalog::product/list/list-mode/list-02.phtml')->toHtml(); ?>
+<?php endif ?>
+
+
+
+<?php 
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $categoryFactory = $objectManager->get('\Magento\Catalog\Model\CategoryFactory');
+    $category = $objectManager->get(\Magento\Framework\Registry::class)->registry('current_category');//get current category
+   $categories_id= $category->getId();
+    $category->getName();
+?>
+
+<?php
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $catId = $categories_id; 
+    $subCategory = $objectManager->create('Magento\Catalog\Model\Category')->load($catId);
+    $subCats = $subCategory->getChildrenCategories();
+    $_helper = $this->helper('Magento\Catalog\Helper\Output');
+    $sub_cat_total=count($subCats);
+    if($sub_cat_total !='' || $sub_cat_total !='0') { ;
+?>
+<div class="custom_categories" >
+<ul class="sub-cat-ul">
+    <?php
+    $k=1;
+     foreach ($subCats as $subcat) {
+        $_category = $objectManager->create('Magento\Catalog\Model\Category')->load($subcat->getId());
+        $subcaturl = $subcat->getUrl();
+          $subcat_id= $subcat->getId();
+         ?>
+         <?php if( $k<=2){ ?>
+        <li class="cat-li">
+            <div class="info">
+                <h4 class="<?php echo $k; ?>"><?php echo $subcat->getName(); ?></h4><a class="link" href="<?php echo $subcaturl ?>"><?php /* @escapeNotVerified */ echo __('View all') ?></a>
+            </div>
+        </li>
+          <div class="product-list-container" id="product-list-container">
+        <div class="products wrapper product-list-style-18 ctst grid products-grid par-category-page">
+                 <ol class="products list items product-items flex-grid">    
+     <?php   
+$category = $categoryFactory->create()->load($subcat_id);
+$categoryProducts = $category->getProductCollection() ->addAttributeToSelect('*');
+$i=1;
+foreach ($categoryProducts as $product) {
+	$mainImage = $product->getData('small_image');
+		$hoveredImage = $product->getData('thumbnail');
+        ?> <?php if( $i< 5){ ?>
+    <li class="item product product-item" <?php echo $i ?>>                              
+                <div class="product-item-info" data-container="product-grid">
+                                        									
+                    <div class="product-item-top"><div class="wishlist_msg">Item added to your wishlist</div>
+                        	                        	                         <img src="http://cyberworx.co.in/fab_radio/images/play-icon.svg" class="play play_audio" data-audio="http://cyberworx.co.in/fab_radio/audio/audio2.mp3">
+
+                                                 <a href="<?php echo $product->getProductUrl() ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                 <span class="product-image-wrapper" style="padding-bottom: <?= $paddingBottom ?>%;">
+                                    <img class="product-image-photo main-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($mainImage)->resize($width, $height)->getUrl() ?>" />
+                                    <img class="product-image-photo hovered-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($hoveredImage)->resize($width, $height)->getUrl() ?>" />
+                                </span>
+                            </span>
+                        </a>
+                        <?= $showQuickShop?$quickShopHelper->getQuickShopButton($product):''; ?>
+                        <?php if ($showCompare || $showWishlist) : ?>
+                        <div class="button-top-wrap">
+                        <?php if ($wishlistHelper->isAllow() && $showWishlist): ?>
+                            <a href="#"
+                               data-post='<?= $block->getAddToWishlistParams($product); ?>'
+                               class="action towishlist" data-action="add-to-wishlist"
+                               title="<?= __('Add to Wish List') ?>">
+                                <span><?= __('Add to Wish List') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
+                            <a href="#" class="action tocompare"
+                               data-post='<?= $compareHelper->getPostDataParams($product);?>'
+                               title="<?= __('Add to Compare') ?>">
+                                <span><?= __('Add to Compare') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <?php endif ?>
+                        
+                                            </div>
+                                        <div class="product details product-item-details">
+												<strong class="product name product-item-name">
+							<a class="product-item-link" href="<?php echo $product->getProductUrl() ?>">
+							<?php 	echo $product->getName(); ?>							</a>
+						</strong>
+												<div class="product description product-item-description">
+							<?= $themeHelper->subString($_helper->productAttribute($product, $product->getShortDescription(), 'short_description'), 70) ?>
+						</div>
+												
+							<?= $showPrice?$block->getProductPrice($product):''; ?>								
+                        <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									<button type="submit" title="<?= $block->escapeHtml(__('Add to Cart')); ?>" class="action tocart primary">
+										<span><?= __('Add to Cart') ?></span>
+									</button>
+								</form>
+							<?php else: ?>
+								<?php if ($product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                                            </div>
+                </div>
+                </li>                
+<?php $i++; } }
+
+  ?>      
+ </ol>
+    </div>
+            
+      </div>          
+     <?php $k++; }  ?>
+     <?php   ?>
+     <?php  } ?> 
+
+</ul>
+</div>
+
+
+<div class="container-fluid fab_section">
+   <div class="fab_single_banner">
+      <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/images/tamil-hits.jpg"></a>
+   </div>
+</div>
+<div class="fab_section">
+   <h2 class="fab_main_heading text-left">Featured Show</h2>
+   <div class="row">
+      <div class="col-md-12">
+         <div class="fab_product_block">
+            <div class="wishlist_msg">Item added to your wishlist</div>
+            <div class="wishlist_msg">Item added to your wishlist</div>
+            <div class="img_box featured_img">
+               <span class="fab_wishlish"><i class="fa fa-heart-o"></i></span>
+               <img src="http://cyberworx.co.in/fab_radio/images/play-icon.svg" class="play">
+               <a href="#"> <img src="http://www.rupinwadhwa.com/fab2/pub/media/catalog/product/cache/0570ed695fc20078a438a74f88f60634/r/a/ramayan.jpg"> </a>
+               <!--<p>Bollywood Top 20</p>-->
+            </div>
+         </div>
+      </div>
+      <div class="col-md-12">
+         <div class="fab_featured_show fab_product_block">
+            <div class="wishlist_msg">Item added to your wishlist</div>
+            <h3 class="fab_flex_left">Top 10</h3>
+            <a href="" class="btn_all fab_flex_right">View All <i class="fa fa-angle-right"></i></a>
+            <div class="content">
+               <p>I will design 2 modern minimalist logo design type modern minimalist logo design 4.9(1k+)</p>
+               <button type="button" class="play_music"><i class="fa fa-play"></i>Preview Sample</button>
+               <div class="starting">
+                  <p>Starting at <span>$100.99</span> </p>
+                  <div class="fab_addtocart">
+                     <tooltip>Add to Cart</tooltip>
+                     <img src="http://www.rupinwadhwa.com/fab2/pub/media/images/fab_radio/redcart.svg">
+                  </div>
+               </div>
+               <hr>
+               <ul class="music_play_list">
+                  <li>
+                     <span class="music_time">03:23</span>
+                     <span class="music_name">
+                        <span class="bold">
+                           01 - Shaitan ka Saala
+                           <p>Housefull 4 - Sohail Sen Featuring Vishal Dadlani</p>
+                        </span>
+                     </span>
+                  </li>
+                  <li>
+                     <span class="music_time">02:44</span>
+                     <span class="music_name">
+                        <strong>01 - Shaitan ka Saala</strong>
+                        <p>Housefull 4 - Sohail Sen Featuring Vishal Dadlani</p>
+                     </span>
+                  </li>
+                  <li>
+                     <span class="music_time">04:05</span>
+                     <span class="music_name">
+                        <strong>01 - Shaitan ka Saala</strong>
+                        <p>Housefull 4 - Sohail Sen Featuring Vishal Dadlani</p>
+                     </span>
+                  </li>
+                  <li>
+                     <span class="music_time">02:54</span>
+                     <span class="music_name">
+                        <strong>01 - Shaitan ka Saala</strong>
+                        <p>Housefull 4 - Sohail Sen Featuring Vishal Dadlani</p>
+                     </span>
+                  </li>
+                  <li><span class="music_time">03:00</span>
+                     <span class="music_name">
+                     <strong>01 - Shaitan ka Saala</strong> 
+                  </li>
+               </ul>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<div class="container-fluid fab_section">
+   <div class="fab_single_banner">
+      <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/images/weekend-class.jpg"></a>
+   </div>
+</div>
+
+
+
+<div class="custom_categories" >
+<ul class="sub-cat-ul">
+    <?php
+    $kk=1;
+     foreach ($subCats as $kkk=>$subcat) {
+        $_category = $objectManager->create('Magento\Catalog\Model\Category')->load($subcat->getId());
+        $subcaturl = $subcat->getUrl();
+          $subcat_id= $subcat->getId();
+         ?>
+     <?php
+         
+      if($kk == 3 || $kk == 4){ ?>
+        <li class="cat-li">
+            <div class="info">
+                <h4 class="<?php echo $kk; ?>"><?php echo $subcat->getName(); ?></h4><a class="link" href="<?php echo $subcaturl ?>"><?php /* @escapeNotVerified */ echo __('View all') ?></a>
+            </div>
+        </li>
+          <div class="product-list-container" id="product-list-container">
+        <div class="products wrapper product-list-style-18 ctst grid products-grid">
+                 <ol class="products list items product-items flex-grid">    
+     <?php   
+    $category = $categoryFactory->create()->load($subcat_id);
+    $categoryProducts = $category->getProductCollection() ->addAttributeToSelect('*');
+     $i=1;
+      foreach ($categoryProducts as $product) {
+    	$mainImage = $product->getData('small_image');
+		$hoveredImage = $product->getData('thumbnail');
+		
+        ?> <?php if( $i< 5){ ?>
+            <li class="item product product-item" <?php echo $i ?>>                              
+                <div class="product-item-info" data-container="product-grid">
+                                        									
+                    <div class="product-item-top"><div class="wishlist_msg">Item added to your wishlist</div>
+                        	                        	                         <img src="http://cyberworx.co.in/fab_radio/images/play-icon.svg" class="play play_audio" data-audio="http://cyberworx.co.in/fab_radio/audio/audio2.mp3">
+
+                                                 <a href="<?php echo $product->getProductUrl() ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                 <span class="product-image-wrapper" style="padding-bottom: <?= $paddingBottom ?>%;">
+                                    <img class="product-image-photo main-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($mainImage)->resize($width, $height)->getUrl() ?>" />
+                                    <img class="product-image-photo hovered-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($hoveredImage)->resize($width, $height)->getUrl() ?>" />
+                                </span>
+                            </span>
+                        </a>
+                        <?= $showQuickShop?$quickShopHelper->getQuickShopButton($product):''; ?>
+                        <?php if ($showCompare || $showWishlist) : ?>
+                        <div class="button-top-wrap">
+                        <?php if ($wishlistHelper->isAllow() && $showWishlist): ?>
+                            <a href="#"
+                               data-post='<?= $block->getAddToWishlistParams($product); ?>'
+                               class="action towishlist" data-action="add-to-wishlist"
+                               title="<?= __('Add to Wish List') ?>">
+                                <span><?= __('Add to Wish List') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
+                            <a href="#" class="action tocompare"
+                               data-post='<?= $compareHelper->getPostDataParams($product);?>'
+                               title="<?= __('Add to Compare') ?>">
+                                <span><?= __('Add to Compare') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <?php endif ?>
+                        
+                                            </div>
+                                        <div class="product details product-item-details">
+												<strong class="product name product-item-name">
+							<a class="product-item-link" href="<?php echo $product->getProductUrl() ?>">
+							<?php 	echo $product->getName(); ?>							</a>
+						</strong>
+												<div class="product description product-item-description">
+							<?= $themeHelper->subString($_helper->productAttribute($product, $product->getShortDescription(), 'short_description'), 70) ?>
+						</div>
+												
+							<?= $showPrice?$block->getProductPrice($product):''; ?>								
+                        <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									<button type="submit" title="<?= $block->escapeHtml(__('Add to Cart')); ?>" class="action tocart primary">
+										<span><?= __('Add to Cart') ?></span>
+									</button>
+								</form>
+							<?php else: ?>
+								<?php if ($product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                                            </div>
+                </div>
+                </li>                
+<?php $i++; } }
+
+  ?>      
+ </ol>
+    </div>
+            
+      </div>          
+     <?php  }  $kk++;?>
+     <?php   ?>
+     <?php  } ?> 
+
+</ul>
+</div>
+
+
+
+<?php } else {?>
+ <div class="product-list-container" id="product-list-container">
+        <div class="products wrapper product-list-style-18 ctst grid products-grid sub-category-page">
+            <div class="info">
+               <h4 class="title"><?php echo $category->getName(); ?></h4>
+            </div>
+                 <ol class="products list items product-items flex-grid">
+     <?php   
+        $category = $categoryFactory->create()->load($categories_id);
+ 
+$categoryProducts = $category->getProductCollection()
+                             ->addAttributeToSelect('*');
+                             
+foreach ($categoryProducts as $product) {
+	$mainImage = $product->getData('small_image');
+						$hoveredImage = $product->getData('thumbnail');
+  
+  ?>       
+            
+           
+                            <li class="item product product-item">                              
+                <div class="product-item-info" data-container="product-grid">
+                                        									
+                    <div class="product-item-top"><div class="wishlist_msg">Item added to your wishlist</div>
+                        	                        	                         <img src="http://cyberworx.co.in/fab_radio/images/play-icon.svg" class="play play_audio" data-audio="http://cyberworx.co.in/fab_radio/audio/audio2.mp3">
+
+                                                 <a href="<?php echo $product->getProductUrl() ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                 <span class="product-image-wrapper" style="padding-bottom: <?= $paddingBottom ?>%;">
+                                    <img class="product-image-photo main-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($mainImage)->resize($width, $height)->getUrl() ?>" />
+                                    <img class="product-image-photo hovered-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($hoveredImage)->resize($width, $height)->getUrl() ?>" />
+                                </span>
+                            </span>
+                        </a>
+                        <?= $showQuickShop?$quickShopHelper->getQuickShopButton($product):''; ?>
+                        <?php if ($showCompare || $showWishlist) : ?>
+                        <div class="button-top-wrap">
+                        <?php if ($wishlistHelper->isAllow() && $showWishlist): ?>
+                            <a href="#"
+                               data-post='<?= $block->getAddToWishlistParams($product); ?>'
+                               class="action towishlist" data-action="add-to-wishlist"
+                               title="<?= __('Add to Wish List') ?>">
+                                <span><?= __('Add to Wish List') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
+                            <a href="#" class="action tocompare"
+                               data-post='<?= $compareHelper->getPostDataParams($product);?>'
+                               title="<?= __('Add to Compare') ?>">
+                                <span><?= __('Add to Compare') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <?php endif ?>
+                        
+                                            </div>
+                                        <div class="product details product-item-details">
+												<strong class="product name product-item-name">
+							<a class="product-item-link" href="<?php echo $product->getProductUrl() ?>">
+							<?php 	echo $product->getName(); ?>							</a>
+						</strong>
+												<div class="product description product-item-description">
+							<?= $themeHelper->subString($_helper->productAttribute($product, $product->getShortDescription(), 'short_description'), 70) ?>
+						</div>
+												
+							<?= $showPrice?$block->getProductPrice($product):''; ?>								
+                        <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									<button type="submit" title="<?= $block->escapeHtml(__('Add to Cart')); ?>" class="action tocart primary">
+										<span><?= __('Add to Cart') ?></span>
+									</button>
+								</form>
+							<?php else: ?>
+								<?php if ($product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                                            </div>
+                </div>
+                </li>                   
+  
+<?php }
+  ?>  
+  </ol>
+    </div>
+            
+
+      </div>
+      <?php } ?>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Fabmarket. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Backend/etc/menu.xsd">
+    <menu>
+        <add id="Fabmarket_Artistoftheweek::fabmarket_index_index" title="Artist" module="Fabmarket_Artistoftheweek"  sortOrder="20" dependsOnModule="Fabmarket_Artistoftheweek" action="artistoftheweek/index/index" resource="Fabmarket_Artistoftheweek::fabmarket_index_index"/>
+<!--AddMenu-->
+    </menu>
+</config>

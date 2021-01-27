@@ -1,0 +1,114 @@
+<?php 
+	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();	
+	$customer_id=$block->checkLoginuser();
+	if($customer_id)
+	{
+?>
+<div class="product_slider">
+<div class="owl-carousel owl-theme products product-items">
+<?php	
+	$resource = $objectManager->get('Magento\Framework\App\ResourceConnection');	
+	$connection = $resource->getConnection();
+	$tableName = $resource->getTableName('mg_browsinghistory_index');
+	$sql = "Select DISTINCT productid FROM " . $tableName." where customerid=".$customer_id;	
+	$result = $connection->fetchAll($sql);	
+	$productids=array_reverse($result);
+	$i=0;
+	foreach($productids as $rowid)
+	{
+		$pid=$rowid['productid'];
+		$product = $objectManager->create('Magento\Catalog\Model\Product')->load($pid);	
+		//print_r("===".$product->getTags());
+		 $pvisibility=$product->getVisibility();
+		 $pname=$product->getName();	
+		if($product->getName()!="" && $pvisibility==4)
+		{
+			if($i<=10)
+			{
+				$mediaurl=$block->getSampleCollection($pid);	
+				//$image_url=$block->getImage($pid);
+				$image_url = $block->imageHelperObj()->init($product, 'product_page_image_small')->setImageFile($product->getFile())->resize($this->getProductimagewidth(),$this->getProductimageheight())->getUrl();
+				if($product->getSpecialPrice()>0)
+				{
+					$pprice= number_format($product->getSpecialPrice(),2);
+				}else
+				{
+					$pprice= number_format($product->getPrice(),2);
+				}
+			
+			?>
+
+			
+			<div class="new_product_box">
+<div class="new_custom_product_img_box product-item-top">
+	<img src="pub/media/images/play-icon.svg" width="65" height="65" alt="audio plyer" class="play fab_play dev_product_play" data-audio="<?php echo $mediaurl; ?>">
+	<a href="/<?php echo $product->getUrlKey(); ?>" >
+	<img src="<?php echo $image_url; ?>" />
+	<p><?php echo $pname; ?></p>
+	</a>
+	<div class="button-top-wrap">
+	<a href="<?php echo $block->getUrl('wishlist', ['_secure' => true]);?>" img src="<?php echo $block->getViewFileUrl('images/wish_icon.jpg'); ?>" data-post='<?php  echo $this->helper('Magento\Wishlist\Helper\Data')->getAddParams($product) ?>' class="action towishlist" data-action="add-to-wishlist"><span>' . __('Add to Wish List') . '</span></a>
+</div>
+</div>
+<div class="new_custom_product_desp_box">
+	<div class="product_desp"><?php echo $product->getShortDescription(); ?></div>
+	<div class="product_price_"><?php echo "$".$pprice; ?> <span>onwards</span></div>
+</div>
+	
+</div>		
+<?php }
+	}
+ }
+	
+	?>
+	</div>
+	</div>
+<script>
+require(['jquery','owlcarousel'], function($){
+$('.product-items').owlCarousel({ 
+loop:true, 
+autoplay:true,
+margin:30,
+dots:false, 
+nav:true, 
+responsive:{ 
+0:{ 
+items:1,
+dots:false,
+nav:true, 
+}, 
+600:{ 
+items:2.5,
+dots:false,
+nav:true,  
+}, 
+1280:{ 
+items:3.5,
+dots:false,
+nav:true,  
+},
+1366:{ 
+items:4.5,
+dots:false, 
+nav:true, 
+},
+1420:{ 
+items:4.5,
+dots:false,
+nav:true, 
+},
+1600:{ 
+items:5.5,
+dots:false,
+nav:true, 
+},
+1900:{ 
+items:5.5,
+dots:false,
+nav:true, 
+}
+} 
+});  
+}); 
+   </script>
+<?php } ?>

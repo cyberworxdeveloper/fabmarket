@@ -1,0 +1,255 @@
+<style>
+.banner-item.banner-slider .item-image {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+.banner-item.banner-slider .item-image > div.fio {
+    position: absolute;
+    width: 100%;
+}
+.banner-item.banner-slider .item-image .banner-title {
+    position: static !IMPORTANT;
+    opacity: 1 !IMPORTANT;
+    background: transparent !important;
+}
+.banner-item.banner-slider .item-image > div.fio .container {
+    margin: 0 auto !IMPORTANT;
+    padding: 0 30px;
+    max-width: 1300px;
+}
+.banner-item.banner-slider .item-image > div.fio h2 {
+    font-size: 34px;
+    font-weight: 800;
+    font-family: 'Nunito Sans', sans-serif !important;
+}
+.banner-item.banner-slider .item-image > div.fio h2 {
+    font-size: 34px;
+    font-weight: 800;
+    font-family: 'Nunito Sans', sans-serif !important;
+    width: 420px;
+}
+.banner-item.banner-slider .item-image:before {
+    position: absolute;
+    content: "";
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #000000, rgba(0, 0, 0, 0.84) 44%, rgba(22, 4, 13, 0) 92%);
+}
+.banner-item.banner-slider .item-image > div.fio p {
+    font-size: 14px;
+    font-weight: 600;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.71;
+    letter-spacing: normal;
+    color: #ffffff;
+    margin: 5px 0 30px 0;
+}
+.banner-item.banner-slider .item-image > div.fio a.banner_btn.fab-btn {
+    display: inline-block;
+    text-decoration: none;
+    width: max-content;
+    padding: 12px 45px;
+    border-radius: 40px;
+    background-color: #cf4347;
+    font-size: 14px;
+    font-weight: 600;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    color: #ffffff;
+    margin-right: 24px;
+}
+.banner-item.banner-slider .item-image .banner-title img {
+    display: inline-block;
+    width: 43px;
+    height: 45px;
+    position: relative;
+    bottom: 20px;
+    cursor: pointer;
+}
+div#banner-slider-carousel .owl-dots {
+    opacity: 1;
+}
+
+div#banner-slider-carousel .owl-dots button {
+    background: transparent !important;
+    bottom: 10px !IMPORTANT;
+    top: inherit;
+    position: relative;
+    width: max-content;
+}
+
+div#banner-slider-carousel .owl-dots button span {
+    margin: 0 4px;
+    padding: 0 0px;
+    display: inline-block;
+    border-radius: 100%;
+    width: 10px;
+    height: 10px;
+    opacity: 0.7;
+    background-color: #ffffff;
+    transition-duration: 0.4s;
+    outline: none;
+}
+
+div#banner-slider-carousel .owl-dots button.owl-dot.active span {
+    opacity: 1 !IMPORTANT;
+    width: 19px !IMPORTANT;
+    height: 10px !IMPORTANT;
+    border-radius: 5px !IMPORTANT;
+    background-color: #ffffff;
+}
+div#banner-slider-carousel .owl-dots {
+    bottom: -5px !important;
+}
+</style>
+<?php
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_BannerSlider
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+use Mageplaza\BannerSlider\Model\Config\Source\Type;
+
+$banners = $block->getBannerCollection();
+
+if (count($banners)) : ?>
+    <?php
+     $sliderId      = $block->getSliderId() . uniqid('-', false);
+    $sliderIdss= $block->getSliderId();
+     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	 $productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+	$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface'); 
+
+    $categoryFactory = $objectManager->get('\Magento\Catalog\Model\CategoryFactory');
+    $category = $objectManager->get(\Magento\Framework\Registry::class)->registry('current_category');//get current category
+       $categories_id= $category->getId();
+  
+  
+
+    $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+    $connection = $resource->getConnection();
+    $sql344 = "SELECT * from mg_mageplaza_bannerslider_slider where slider_id=$sliderIdss";
+    $data_image = $connection->fetchAll($sql344);
+      $slider_cat_id= $data_image[0]['categories_id'];
+      if($categories_id == $slider_cat_id){
+      
+    $sliderOptions = $block->getBannerOptions(); ?>
+    <div class="carousel-container">
+        <div id="banner-slider-carousel">
+            <?php $iterator = 1; ?>
+            <div id="bannerslider-list-items-<?= $sliderId; ?>"
+                 class="owl-carousel owl-theme">
+                <?php foreach ($banners as $banner) : ?>
+                    <?php
+                    $bnType  = $banner->getType();
+                    $bnTitle = $banner->getTitle();
+                    $bnUrl   = $banner->getUrlBanner();
+		  			$mediaUrl='';
+		  			$pr_url='';
+		  			if($bnUrl!='')
+					{
+						$product = $productRepository->get(trim($bnUrl));
+						$pr_url=$product->getProductUrl();
+						
+						
+							if ($product->getExtensionAttributes() && $product->getExtensionAttributes()->getDownloadableProductSamples()) {
+											foreach ($product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+												if($links->getSampleUrl()!='')
+												{
+													$mediaUrl=$links->getSampleUrl();
+												}else{
+												 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+												}
+												
+												 break;
+											}
+										}
+					
+
+					}
+		  
+		  			
+                    $bnImg   = $banner->getImageUrl();
+                    $bnname= $banner->getName();
+                    ?>
+                    <?php if (($bnType === Type::CONTENT && empty($banner->getContent())) || ($bnType === Type::IMAGE && empty($banner->getImage()))) : continue; ?>
+                    <?php endif; ?>
+                    <?= ($iterator++ === 1) ? '<div class="banner-item banner-slider">' : '</div><div class="banner-item banner-slider">' ?>
+                    <?php if ($bnType === Type::CONTENT) : ?>
+                        <div class="item-content">
+                            <?= $block->getPageFilter($banner->getContent()); ?>
+                        </div>
+                    <?php else : #image type?>
+                        <div class="item-image">
+                            
+                                <?php if (!empty($bnTitle)) : ?>
+                                <div class="fio">
+                                    <div class="container">
+                                        <div class="banner-title">
+                                            <h2> <?= $bnname ?> </h2>
+                                        <p><?= $bnTitle ?></p>
+                                         <?php if (!empty($bnUrl)) : ?>
+                                        <a href="<?= $pr_url; ?>" <?= ($banner->getNewtab() === '1') ? 'target="_blank"' : '' ?> class="banner_btn fab-btn">Buy Now</a>
+                                         <?php endif; ?>
+											
+											 <?php
+										 if($mediaUrl!='')
+										 {
+											 ?>
+										<img class="play_music audio_play sample_artist" data-mediaurl="<?php echo $mediaUrl;?>" data-music="audio5" src="pub/media/images/show-play.svg">
+										 <?php
+										 }
+										?>
+											
+                                      <!--  <img src="http://cyberworx.co.in/fab_radio/images/show-play.svg">-->
+                                         </div>
+                                         </div>
+                                        </div>
+                                    <?php endif; ?>
+							<div class="pro_img" style="display:none">
+								 <img class="owl-image img-responsive" src="<?= $bnImg ?>" >
+							</div>		
+                                <img class="owl-image img-responsive" src="<?= $bnImg ?>"
+                                     title="<?= $bnTitle ?>">
+							
+                          
+                        </div>
+                        
+                        
+                        
+                    <?php endif; ?>
+                    <?= ($iterator === count($banners) + 1) ? '</div>' : '' ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?= $block->getPagerHtml() ?>
+    </div>
+
+    <script>
+        require(['jquery', 'mageplaza/core/owl.carousel'], function ($) {
+            $('#bannerslider-list-items-<?= $sliderId; ?>').owlCarousel(<?= $sliderOptions; ?>);
+        });
+    </script>
+    <?php } ?>
+<?php endif; ?>

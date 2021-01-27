@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Fabmarket. All rights reserved.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Backend/etc/menu.xsd">
+    <menu>
+        <add id="Fabmarket_Subscribedetails::fabmarket_index_index" title="Subscribedetails" module="Fabmarket_Subscribedetails"  sortOrder="20" dependsOnModule="Fabmarket_Subscribedetails" action="subscribedetails/index/index" resource="Fabmarket_Subscribedetails::fabmarket_index_index"/>
+<!--AddMenu-->
+    </menu>
+</config>

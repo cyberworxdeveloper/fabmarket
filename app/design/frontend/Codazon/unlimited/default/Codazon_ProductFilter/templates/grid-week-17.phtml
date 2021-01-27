@@ -1,0 +1,96 @@
+<?php
+   /**
+    * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+    * See COPYING.txt for license details.
+    */
+   use Magento\Framework\App\Action\Action;
+   
+   // @codingStandardsIgnoreFile
+   
+   ?>
+<?php
+   /**
+    * Product list template
+    *
+    * @var $block \Magento\Catalog\Block\Product\ListProduct
+    */
+   ?>
+<?php
+   $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+   
+   $collection = $block->getProductCollection();
+   
+   $listBlock = $objectManager->get('\Magento\Catalog\Block\Product\View');
+   $storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface'); 
+   $productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+   
+ ?>
+<div class="container-fluid fab_section">
+   <div class="row">
+      <div class="col-md-24">
+         <div class="fav_artist_block">
+            <?php
+               foreach ($collection as $product) {
+                
+               			 $imageUrl = $product->getMediaConfig()->getMediaUrl($product->getImage());
+               		  		$_product = $productRepository->get($product->getSKU());
+               							
+               							    $mediaUrl='';
+               							
+               								 if ($_product->getExtensionAttributes() && $_product->getExtensionAttributes()->getDownloadableProductSamples()) {
+               										foreach ($_product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+               											if($links->getSampleUrl()!='')
+               											{
+               												$mediaUrl=$links->getSampleUrl();
+               											}else{
+               											$mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+               											}
+               											
+               											 break;
+               										}
+               									}
+               		  
+               		  $imageUrl = $product->getMediaConfig()->getMediaUrl($product->getImage());
+                
+                				$artist_name= $product->getResource()->getAttribute('artist_name')->getFrontend()->getValue($product);
+                				$news_from_date= $product->getResource()->getAttribute('news_from_date')->getFrontend()->getValue($product);
+                                
+                ?>
+            <div class="fab_artist">
+               <div class="img_block img_box pro_img"><a href="<?= $product->getProductUrl() ?>"><img  src="<?php echo $imageUrl?>"></a></div>
+               <div class="content_block">
+                  <?php
+                     if($artist_name!='')
+                     {
+                      
+                      
+                      
+                     
+                     ?>
+                  <h3><a href="<?= $product->getProductUrl() ?>"><?php echo $artist_name;?></a></h3>
+                  <p><a href="<?= $product->getProductUrl() ?>"><?php echo $product->getName();?></a></p>
+                  <p><strong>Worldwide Release</strong></p>
+                  <p class="date"><?php echo date("d F Y", strtotime($news_from_date));?></p>
+                  <?php
+                     }
+                     ?>
+                  <div class="content_box">
+                     <?php if( $mediaUrl!='')
+                        {
+                        				?>
+                     <span class="video_btn"><img src="pub/media/images/play-icon.svg" class="play play_audio" data-audio="<?php echo $mediaUrl;?>">
+                     </span>
+                     <?php
+                        }
+                        	?>
+                     <p><?php echo $product->getShortDescription();?></p>
+                  </div>
+               </div>
+            </div>
+            <?php
+               }
+               ?>
+         </div>
+      </div>
+   </div>
+</div>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Meetanshi_SocialMetaTag::socialmetatag"
+             title="Social Meta Tags"
+             module="Meetanshi_SocialMetaTag"
+             sortOrder="10"
+             resource="Meetanshi_SocialMetaTag::socialmetatag"/>
+
+        <add id="Meetanshi_SocialMetaTag::socialmetatag_configuration"
+             title="Configuration"
+             module="Meetanshi_SocialMetaTag"
+             sortOrder="20"
+             action="adminhtml/system_config/edit/section/socialmetatag"
+             resource="Meetanshi_SocialMetaTag::config_socialmetatag"
+             parent="Meetanshi_SocialMetaTag::socialmetatag"/>
+    </menu>
+</config>

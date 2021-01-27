@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <tab id="vgroup" translate="label" sortOrder="500">
+            <label>Our Client</label>
+        </tab>
+        <section id="testimonial" translate="label" type="text" sortOrder="320" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Client</label>
+            <tab>vgroup</tab>
+            <resource>Vgroup65_Testimonial::configuration</resource>
+            <group id="configuration" translate="label" type="text"  sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="top_navigation_menu_text" translate="label comment" sortOrder="1" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Top Navigation Menu Text</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="display_top_menu" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Display Client Link in Top Navigation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="display_type" translate="label comment" sortOrder="1" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Display Type</label>
+                    <source_model>Vgroup65\Testimonial\Model\Config\Source\DisplayType</source_model>
+                </field>
+                <field id="no_of_display" translate="label comment" sortOrder="1" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Clinet To Display In Widget</label>
+                </field>
+                <field id="auto_rotation" translate="label comment" sortOrder="1" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Auto Rotation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group> 
+        </section>    
+    </system>
+</config>

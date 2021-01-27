@@ -1,0 +1,24 @@
+
+<h2 class="fab_main_heading">Our Clients</h2>
+<div class="container">
+<div class="row">
+<div class="col-md-24">
+<div class="fab_clients">
+   <?php
+  $getTestimonialList = $block->getTestimonialList();
+      if ($getTestimonialList['status'] == '0'):
+      echo __("No result Found");
+     endif;
+     if ($getTestimonialList['status'] == '1'):
+         $i=1;
+         foreach ($getTestimonialList['testimonials'] as $testimonial):
+            if (!empty($testimonial['resize_image'])):
+                          ?>
+<div class="client"><img src="<?php echo $block->getBaseUrl() . $testimonial['resize_image']; ?>" alt=""></div>
+<?php  endif; ?>
+<?php endforeach; ?>
+<?php  endif; ?>
+</div>
+</div>
+</div>
+</div>

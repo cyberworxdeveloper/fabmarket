@@ -1,0 +1,145 @@
+<?php
+/**
+ * GiaPhuGroup Co., Ltd.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the GiaPhuGroup.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.giaphugroup.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Cyberworx
+ * @package     Cyberworx_CustomerAccount
+ * @copyright   Copyright (c) 2018-2019 GiaPhuGroup Co., Ltd. All rights reserved. (http://www.giaphugroup.com/)
+ * @license     https://www.giaphugroup.com/LICENSE.txt
+ */
+ /** @var \Cyberworx\CustomerAccount\Block\Form\Login $block */
+?>
+<?php if (!$block->customerIsAlreadyLoggedIn()): ?>
+    <style>
+        .customer-popup-login {
+            display: none;
+        }
+        .or-another-selection {
+            display: inline-block;
+            padding-right: 5px;
+        }
+        @media(max-width: 767px) {
+            .or-another-selection {
+                display: block;
+                text-align: center;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+    <div id="customer-popup-login" class="customer-popup-login">
+		
+        <div class="fab_popup_section with_image show"  style="display: block;">
+		<div class="fab_popup_container">
+			<div class="fab_popup min-height">
+			<button class="action-close" data-role="closeBtn" type="button">
+                <span>Close</span>
+            </button>
+				<div class="logo_section">
+					<img src="<?php echo $block->getBaseUrl(); ?>pub/media/logo/default/form_logo.png" width="213" height="70" alt="Fab Market">
+				</div>
+            <div class="block block-customer-login">
+            <div class="block-content" aria-labelledby="block-customer-popup-login-heading">
+                <form class="form form-login"
+                      action="<?php /* @escapeNotVerified */ echo $block->getPostActionUrl() ?>"
+                      method="post"
+                      id="customer-popup-login-form"
+                      data-mage-init='{"validation":{}}'>
+                    <?php echo $block->getBlockHtml('formkey'); ?>
+                   
+                    <input type="hidden" name="redirect_url" value=" <?php echo $this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]); ?>" />
+                    				<h2>Login to continue</h2>
+                    <fieldset class="fieldset login" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+                        <div class="field note"><?php /* @escapeNotVerified */ echo __('If you have an account, sign in with your email address.') ?></div>
+                        <div class="messages"></div>
+                        <div class="field email required">
+                            <label class="label"><span><?php /* @escapeNotVerified */ echo __('Email ID') ?></span><mand>*</mand></label>
+                            <div class="control">
+                                <input name="username" value="" <?php if ($block->isAutocompleteDisabled()) :?> autocomplete="off"<?php endif; ?> id="email-login" type="email" class="fab_input" title="<?php /* @escapeNotVerified */ echo __('Email') ?>" data-validate="{required:true, 'validate-email':true}">
+                            </div>
+                        </div>
+                        <div class="field password required">
+                            <label class="label"><span><?php /* @escapeNotVerified */ echo __('Password') ?></span><mand>*</mand></label>
+                            <div class="control">
+                                <input name="password" type="password" <?php if ($block->isAutocompleteDisabled()) :?> autocomplete="off"<?php endif; ?> class="fab_input" id="pass-login" title="<?php /* @escapeNotVerified */ echo __('Password') ?>" data-validate="{required:true}" >
+                            </div>
+                        </div>
+
+                    <!-- <span class="fab_popup_btn" id="customer-popup-forget" data="Forget_password">Forgot Password?</span>-->
+						
+						
+						<div class="secondary forgot"><a class="action remind" href="<?php /* @escapeNotVerified */ echo $block->getCustomerForgetUrl() ?>" id="customer-popup-forget"><span><?php /* @escapeNotVerified */ echo __('Forgot Password?') ?></span></a></div>
+						
+                  
+                        <div class="actions-toolbar">
+                            <div class=""><button type="submit" class="action login primary fab_input submit fab-btn" name="send" id="send2-login"><span><?php /* @escapeNotVerified */ echo __('Login') ?></span></button></div>
+                         
+                        </div>
+                           
+                    </fieldset>
+                </form>
+                <?php if ($block->getRegistration()->isAllowed()): ?>
+                                
+                                <div class="secondary"> Don't have an account? <a class="action remind" href="<?php /* @escapeNotVerified */ echo $block->getCustomerRegistrationUrl() ?>" id="customer-popup-registration"><span><?php /* @escapeNotVerified */ echo __('Register as a User') ?></span></a></div>
+				
+	
+                <a href="<?php echo $block->getBaseUrl(); ?>customer/account/create/" class="action create primary regetr_slllet_link_pop">	<p>Or</p><span>Register as a seller</span></a>
+        
+                            <?php endif; ?>
+            </div>
+        </div>
+           </div>
+        </div>
+        </div>
+        <script type="text/x-magento-init">
+            {
+                "#customer-popup-login": {
+                    "Cyberworx_CustomerAccount/js/action/customer-authentication-popup": {
+                        "innerWidth": "600"
+                    }
+                }
+            }
+        </script>
+    </div>
+<?php endif; ?>
+<div class="fab_popup_bg"></div>
+<div class="fab_popup_section with_image fab_forgot_popup" style="display:none">
+		<div class="fab_popup_container">
+			<div class="fab_popup min-height">
+				<i class="popup_close"></i>
+				<div class="logo_section">
+					<img src="<?php echo $block->getBaseUrl(); ?>pub/media/logo/default/form_logo.png" width="213" height="70" alt="Fab Market">
+					<p>Fever Audio Buzz</p>
+				</div>
+				
+				<div class="fab_form_contain">
+				<form action="#" method="POST">
+				<h2>Forgot your password?</h2>
+					<div class="fab_form_box">
+						<label>Work Email</label>
+						<input type="email" class="fab_input" required="" autocomplete="off"> 
+						<span class="text-left">This user id does not exist with us , please enter a valid user id</span>
+					</div>
+				
+					
+					<div class="fab_form_box ">
+						<button type="submit" class="fab_input submit fab-btn">Submit</button>
+					</div>
+					
+				</form>
+			</div>
+			</div>
+		</div>
+	</div>
+
+

@@ -1,0 +1,8 @@
+<?php if (!empty($block->getTags())) {
+    foreach ($block->getTags() as $tagName => $content) {
+        if (!empty($content)) {
+            echo '<meta property="' . $tagName . '" content="' . $content . '" />' . PHP_EOL;
+        }
+    }
+} ?>
+

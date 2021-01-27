@@ -1,0 +1,51 @@
+<?php
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_Productslider
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+use Magento\Framework\App\Action\Action;
+use Mageplaza\Productslider\Block\AbstractSlider;
+
+/** @var AbstractSlider $block */
+
+$mode = 'grid';
+$title = $block->getTitle();
+$id = $block->getData('page_var_name') . uniqid('', false);
+if ($items = $block->getProductCollection()) : ?>
+    <div class="mp-product-slider-block widget block-products-list">
+        <h2 class="mp-product-slider-title"><?= $block->escapeHtml($block->getTitle())."llll".count($items); ?></h2>
+        <p class="mp-ps-info"><?= $block->escapeHtml($block->getDescription()) ?></p>
+    </div>
+    <div class="block-content">
+        <div class="products-grid grid">
+            <ol class="product-items widget-viewed-grid">
+                <?php $iterator = 1; ?>
+                <div id="mp-list-items-test<?= /** @noEscape */ $id ?>"
+                     class="owl-carousel owl-theme">
+                    <?php foreach ($items as $_item) : ?>
+                     <?php echo "hiii".$_item->getName();?>
+					
+                    <?php endforeach; ?>
+                    </div>
+                </ol>
+            </div>
+           
+        </div>
+   
+<?php endif; ?>

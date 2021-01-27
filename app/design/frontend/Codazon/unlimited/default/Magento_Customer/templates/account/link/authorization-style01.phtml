@@ -1,0 +1,149 @@
+</ul>
+<div style="display:none;">
+<?php
+echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('top_left_menu')->toHtml();
+
+?>
+</div>
+
+<div class="fab_contact"><a href="<?php echo $block->getBaseUrl(); ?>contact/" >Contact Us</a> </div>
+
+<?php
+/**
+ * Copyright © 2017 Codazon, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Customer\Block\Account\AuthorizationLink $block */
+$dataPostParam = '';
+$styleClass = 'authorization-style-01';
+$helper = $this->helper('Codazon\ThemeLayoutPro\Helper\Data');
+$displayStyle = $this->getData('display_style')?:($helper->getAccountPanelStyle()?:'dropdown');
+$uniqid = uniqid();
+?>
+<!-- authorization style 01 -->
+<?php if ($displayStyle == 'sidebar') : ?>
+    <?php $direction = $this->getData('direction')?:'right'; ?>
+    <?php if ($block->isLoggedIn()) : ?>
+    <?php
+    $dataPostParam = sprintf(" data-post='%s'", $block->getPostParams());
+    $customer = \Magento\Framework\App\ObjectManager::getInstance()->create('Magento\Customer\Model\Session')->getCustomer();
+    ?>
+    <li class="authorization-link <?php echo $styleClass ?>">
+        <div class="account-wrapper">
+            <a href="javascript:;" class="account-trigger cdz-top-link" data-sidebartrigger='{"side": "<?= $direction ?>"}'>
+                <span class="text-underlink"><?php echo __('Helloss %1','<span data-customerinfo="firstname"></span>'); ?></span>
+                <span class="text-uppercase"><?php echo __('Your account'); ?></span>
+            </a>
+        </div>
+    </li>
+    <?php else : ?>
+    <li class="authorization-link <?php echo $styleClass ?>">
+        <div class="account-wrapper">
+            <a href="javascript:;" class="account-trigger cdz-top-link" data-sidebartrigger='{"side": "<?= $direction ?>"}'>
+                <span class="text-underlink"><?php echo __('Hello tt, sign in'); ?></span>
+                <span class="text-uppercase"><?php echo __('Your account'); ?></span>
+            </a>
+        </div>
+    </li>
+    <?php endif ?>
+<?php elseif ($displayStyle == 'popup') : ?>
+    <?php if ($block->isLoggedIn()) : ?>
+    <?php
+    $dataPostParam = sprintf(" data-post='%s'", $block->getPostParams());
+    $customer = \Magento\Framework\App\ObjectManager::getInstance()->create('Magento\Customer\Model\Session')->getCustomer();
+    ?>
+    <li class="authorization-link <?php echo $styleClass ?>">
+        <div class="account-wrapper">
+            <a href="javascript:;" class="account-trigger cdz-top-link" data-cdzpopuptrigger="account-popup">
+                <span class="text-underlink"><?php echo __('Hellofgfdg %1','<span data-customerinfo="firstname"></span>'); ?></span>
+                <span class="text-uppercase"><?php echo __('Your account'); ?></span>
+            </a>
+        </div>
+    </li>
+    <?php else : ?>
+    <li class="authorization-link <?php echo $styleClass ?>">
+        <div class="account-wrapper">
+            <a href="javascript:;" class="account-trigger cdz-top-link" data-cdzpopuptrigger="account-popup">
+                <span class="text-underlink"><?php echo __('Hello tt, sign in'); ?></span>
+                <span class="text-uppercase"><?php echo __('Your account'); ?></span>
+            </a>
+        </div>
+    </li>
+    <?php endif ?>
+    <div style="display:none">
+        <div class="md-dialog-container account-popup" data-cdzpopup id="account-popup">
+            <div class="md-dialog-inner">
+                <?php echo $block->getBlockHtml('utilities.content'); ?>
+                <?php echo $block->getChildHtml(); ?>
+            </div>
+        </div>
+    </div>
+<?php else : /* dropdown */ ?>
+    <?php if ($block->isLoggedIn()) : ?>
+    <?php
+    $dataPostParam = sprintf(" data-post='%s'", $block->getPostParams());
+    $customer = \Magento\Framework\App\ObjectManager::getInstance()->create('Magento\Customer\Model\Session')->getCustomer();
+
+
+		
+    ?>
+    <li class="authorization-link <?php echo $styleClass ?>" style="display: none;">
+        <div class="cdz-dropdown account-wrapper" data-role="cdz-dropdown">
+            <a href="javascript:void(0)" class="account-trigger cdz-dd-trigger cdz-top-link" data-role="cdz-dd-trigger">
+                <span class="text-underlink"><?php echo __('Hellobbbb %1','<span data-customerinfo="firstname"></span>'); ?></span>
+                <span class="text-uppercase"><?php echo __('Your account'); ?></span>
+            </a>
+            <div class="cdz-dd-content" data-role="cdz-dd-content">
+                <div class="cdz-dd-content-inner">
+                    <?php echo $block->getBlockHtml('utilities.content'); ?>
+                    <?php echo $block->getChildHtml(); ?>
+                </div>
+            </div>
+        </div>
+    </li>
+
+
+                         <div class="fab_user_btn">
+							<button type="button" class="fab_button fab_user"><span data-customerinfo="firstname"></button>
+							<i class="fa fa-angle-down"></i>
+							<ul>
+								<li><a href="<?php echo $block->getBaseUrl(); ?>customer/account/edit/">My Account</a></li>
+              <?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->create('Magento\Customer\Model\Session');
+
+if ($customerSession->isLoggedIn()) {
+   $customer_id= $customerSession->getCustomerId();  // get Customer Id
+      }
+?>
+ <?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+$connection = $resource->getConnection();
+$sql2 = "SELECT * FROM `mg_marketplace_userdata` WHERE seller_id=$customer_id AND is_seller =1";
+$data2 = $connection->fetchAll($sql2);
+$total2= count($data2);
+?>
+
+
+<?php if($total2 !=0  ){  ?>
+	
+
+								<li><a href="<?php echo $block->getBaseUrl(); ?>marketplace/account/dashboard/">Dashboard</a></li>
+							<?php } ?>	
+
+                                                                  <li><a href="<?php echo $block->getBaseUrl(); ?>wishlist">Wishlist</a></li>
+								<li><a href="<?php echo $block->getBaseUrl(); ?>/customer/account/logout/">Logout</a></li>
+							</ul>
+					    	</div>
+    
+    
+    <?php else : ?>
+                     <div class="fab_account">
+                        <button type="button" class="fab_button customer-login-link">Login</button>
+                     </div>
+    <?php endif ?>
+<?php endif ?>

@@ -1,0 +1,287 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+<?php echo $this->getElementHtml() ?>
+<ul class="footer_custom_link">
+
+    <?php $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+if($customerSession->isLoggedIn()) {?>
+  <li><a href="http://lykanmedia.com/marketplace/account/dashboard/">Vendor Profile</a></li>
+  <script>
+require([ 'jquery'], function ($) {
+$( window ).load(function() {
+//$("tr.totals th.mark span.title").css("display","none");
+//$("tr.totals th.mark span.discount").css("display","block");
+  $.ajax({
+				url: 'http://lykanmedia.com/user/checkwishlist/Index/',
+				processData: false,
+				contentType: false,
+				showLoader: true,
+				type: 'POST',
+    			success:function(data){
+    			 console.log(data);
+    			 
+    			 var i;
+    			 var res = data.split(",");
+                    for (i = 0; i < data.length; i++) {
+                      $("body").prepend('<p class="wishlist_pro_id">'+res[i]+'</p>');
+                    }
+
+                 }
+			});
+			return;
+});
+/*$("body").delegate(".already_in_wishlist ","click",function(){
+//$(this).attr("data-post","");
+var item= $(this).attr("data-remove");
+var uenc=""; 
+var form_key=$("input[name=form_key]").val();
+var currentUrl="https://www.fabmarket.in/wishlist";
+  $.ajax({
+		url:'https://www.fabmarket.in/ajaxpost/product_wishlist/remove/',
+		dataType: 'json',
+                data: 'item='+item+'&form_key='+form_key+'&currentUrl='+currentUrl,
+				type: 'POST',
+    			success:function(data){
+					console.log(data);
+    			$("body").prepend('<div class="widhlist_pro_msg__">'+data.message+'</div>');
+				setTimeout(function(){
+					$(".widhlist_pro_msg__").remove();
+				},5000);
+                   
+					
+
+                 }
+			});
+	$(this).prev().show();
+					$(this).remove();
+});*/
+
+$("body").delegate("#checklogin_baar","click",function(){
+	alert( "Handler for" );
+});
+
+$("body").delegate(".towishlist","click",function(){
+		$(this).addClass('already_in_wishlist');
+		//$(this).removeClass('towishlist');
+		//var wishremoveid = $(this).attr('data-remove');
+		//var wishremovebtn = `<a href="#" data-remove="`+wishremoveid+`" data-post="" class="action  already_in_wishlist" data-action="add-to-wishlist" title="Remove to Wish List"> <span>Remove to Wish List</span> </a>`;
+		//$(this).after(wishremovebtn);
+		//$(this).hide();
+		
+});	
+
+$("body").delegate("#sidebarcheckout","click",function(){
+	//alert();
+	location.href == 'http://lykanmedia.com/checkout/cart/';
+});
+
+});
+ </script>
+<?php }else{
+	
+echo  '<li class="customer-login-link" data="login" >Vendor Profile</a></li> ';
+?>
+	<script>
+	require([ 'jquery'
+], function ($) {
+	setTimeout(function(){
+	$("body").addClass("not_loginnn");
+		//console.log("hihihiihi");
+		var loginbtnn = `<button type="button" class="action primary customer-login-link"  data="login" title="Go to Checkout">
+                 <span>Go to Checkout</span>
+                </button>`;
+				
+		var cartbutton = `<a href="<?php echo $block->getBaseUrl(); ?>checkout/cart/" class="minicart_addtocart_btn__">
+                 <span>Go to Cart</span>
+                </a>`;
+				
+				
+		var loginbtnn2 = `<button type="button" class="action primary checkout primary customer-login-link" data="login" title="Go to Checkout">
+                    <span>Go to Checkout</span>
+                </button>`;
+				/*$("div#desk_cart-wrapper").click(function(){
+					var btnlength = $("div#minicart-content-wrapper .primary.layout-row button.customer-login-link").length;
+					
+					if(btnlength < 1){
+	$("div#minicart-content-wrapper button#top-cart-btn-checkout").after(cartbutton);
+					}
+				});*/
+				
+				/*$("button.action.tocart.primary").click(function(){
+					var btnlength2 = $("div#minicartpro-content-wrapper .primary.layout-row button.customer-login-link").length;
+					if(btnlength2 < 1){
+				$("div#minicartpro-content-wrapper button#btn-minicart-close").after(loginbtnn2);
+					}
+					
+				});*/
+	$("div#minicart-content-wrapper button#top-cart-btn-checkout").hide();
+	},1000);
+});
+	</script>
+	<?php
+ } 
+ ?>
+ <script>
+function nextcustomstep() { 
+//alert("hi"); 
+	document.getElementById("baddress").style.display = "none"; 
+	document.getElementById("tax_total_onepage").style.display = "block"; 
+	document.getElementById("pmethod").style.display = "block"; 
+	require(['jquery'], function ($) {
+		$(".progress-bar ul li:nth-child(3)").addClass("active");
+
+$("body.fab.checkout-index-index a.gotocartbtn__").parent().append('<a href="javascript:void(0)" class="gotocartbtn__ gotoback_btn_adress">Back</a>');
+$("body.fab.checkout-index-index a.gotocartbtn__").hide();
+
+
+	});	
+	
+}
+function myFunction(id)
+{
+	//alert(id);
+	var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {  
+		var data=this.responseText;   
+//alert(data);		
+		var objArr = JSON.parse(data);
+			
+			var updatedData=objArr['minicartUpdate']['updatedData'];
+			//console.log(updatedData);
+			var val=updatedData.split("-");
+			require([ 'jquery'], function ($) {
+			$(".subtotal .price-container .price-wrapper .price").html("$"+val[0]);
+			$(".showcart .counter-number").html(val[1]);
+
+			var sidebaritem=objArr['sidebaritem'];
+			var htm="";
+			
+			for (i = 0; i < sidebaritem.length; i++) {
+			 // htm+="<p><span>"+sidebaritem[i]['img']+"</<span><span>"+sidebaritem[i]['itemname']+"</span><span>Qty:"+sidebaritem[i]['qty']+"</span><span>"+sidebaritem[i]['sku']+"</span><span>"+sidebaritem[i]['sku']+"</span></p>";
+			  
+			   htm+='<div class="single_cart_side_det"><div class="row"><div class="col-md-6 col-xs-6"><div class="img_box"><img src="'+sidebaritem[i]['img']+'"></div><button class="removeitem" onclick="myFunction('+sidebaritem[i]['itemid'].trim()+')">Remove</button></div><div class="col-md-12 col-xs-12"><p class="proname_">'+sidebaritem[i]['itemname']+'</p></div><div class="col-md-6 col-xs-6"><p class="proprice_">$'+sidebaritem[i]['price']+'</p><p class="proqty_">Qty:<span>'+sidebaritem[i]['qty']+'</span></p></div></div></div>';
+			}
+			$(".sidebar-cart-inner").html(htm);
+			
+			var subtotal=objArr['subtotal']['subtotal'];
+			var carttotal='<p>Cart Subtotal: <span>$'+subtotal+'</span></p><a href="http://3.6.21.143/" class="shopping_btn">Keep Shopping</a><a href="javascript:void(0);" class="checkout_btn_btm butnot  customer-login-link">Go To Checkout</a><a href="http://3.6.21.143/checkout/cart" class="checkout_btn_btm butyes">Go To Checkout</a>';
+			$(".sidebar_bottom_info_box").html(carttotal);
+		});
+		refreshcart();
+    }
+  };
+  xhttp.open("GET", "http://lykanmedia.com/sidebarremoveitem/index/index?itemid="+id, true);
+  xhttp.send();	
+	
+}
+	/*require([ 'jquery'], function ($) {
+		setTimeout(function(){ 
+			
+			if($("span").hasClass("telephoneprefix"))
+			{
+				return;
+			}else{
+				$( "input[name='telephone']" ).parent( "._with-tooltip" ).prepend( "<span class='telephoneprefix'>+65</span>" );
+			}
+			
+			
+		}, 10000);
+		
+		
+				setTimeout(function(){ 
+			
+			if($("span").hasClass("telephoneprefix"))
+			{
+				return;
+			}else{
+				$( "input[name='telephone']" ).parent( "._with-tooltip" ).prepend( "<span class='telephoneprefix'>+65</span>" );
+			}
+			
+			
+		}, 15000);
+		
+				setTimeout(function(){ 
+			
+			if($("span").hasClass("telephoneprefix"))
+			{
+				return;
+			}else{
+				$( "input[name='telephone']" ).parent( "._with-tooltip" ).prepend( "<span class='telephoneprefix'>+65</span>" );
+			}
+			
+			
+		}, 20000);
+		
+				setTimeout(function(){ 
+			
+			if($("span").hasClass("telephoneprefix"))
+			{
+				return;
+			}else{
+				$( "input[name='telephone']" ).parent( "._with-tooltip" ).prepend( "<span class='telephoneprefix'>+65</span>" );
+			}
+			
+			
+		}, 25000);
+		
+				setTimeout(function(){ 
+			
+			if($("span").hasClass("telephoneprefix"))
+			{
+				return;
+			}else{
+				$( "input[name='telephone']" ).parent( "._with-tooltip" ).prepend( "<span class='telephoneprefix'>+65</span>" );
+			}
+			
+			
+		}, 30000);
+		
+				setTimeout(function(){ 
+			
+			if($("span").hasClass("telephoneprefix"))
+			{
+				return;
+			}else{
+				$( "input[name='telephone']" ).parent( "._with-tooltip" ).prepend( "<span class='telephoneprefix'>+65</span>" );
+			}
+			
+			
+		}, 35000);
+		
+				setTimeout(function(){ 
+			
+			if($("span").hasClass("telephoneprefix"))
+			{
+				return;
+			}else{
+				$( "input[name='telephone']" ).parent( "._with-tooltip" ).prepend( "<span class='telephoneprefix'>+65</span>" );
+			}
+			
+			
+		}, 40000);
+	});*/
+</script>
+<script>  
+function refreshcart()
+{
+	//alert("hi");
+		require([
+'Magento_Customer/js/customer-data'
+], function (customerData) {
+var sections = ['cart'];
+customerData.invalidate(sections);
+customerData.reload(sections, true);
+});
+}
+</script>
+
+ </ul>
+ 
+ 

@@ -1,0 +1,22 @@
+<div class="sucess_confrim_reset">
+<h1 class="page-title"><span class="base" data-ui-id="page-title-wrapper">You are updated your password.</span></h1>
+<p>
+Password has been successfully updated. You are being redirected to homepage in <span id="customid">5</span> seconds.
+</p> 
+</div>
+<script>
+require(['jquery'], function($){
+	var i=6; 
+	var x =setInterval(function()
+	{ 
+		i=i-1;
+		$("#customid").html(i);
+		if(i<0)
+		{
+			$("#customid").html(0);
+			clearInterval(x);
+			window.location.href = "http://3.6.21.143/";
+		}   
+	},1000);
+});
+</script>

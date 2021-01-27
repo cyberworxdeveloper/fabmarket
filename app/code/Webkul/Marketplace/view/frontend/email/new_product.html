@@ -1,0 +1,180 @@
+<!--
+/**
+ * Webkul Software.
+ *
+ * @category  Webkul
+ * @package   Webkul_Marketplace
+ * @author    Webkul
+ * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+-->
+<!--@subject Request To Approve Product  @-->
+<!--@vars {
+"var this.getUrl($store, 'customer/account/')":"Customer Account URL",
+"var customer.email":"Customer Email",
+"var customer.name":"Customer Name"
+} @-->
+
+<html><head>
+	<title>New Vendor</title>
+</head>
+<body style="
+    margin: 0;
+    background: whitesmoke;
+    font-family: sans-serif;
+">
+<div class="mailer_body" style="
+    width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding-bottom: 50px;
+">
+	<div class="top_section" style="background-image:url(http://3.6.21.143/pub/media/mailer-image/vendor_header.jpg);height: 154px;border-bottom: 2px solid #dcdcdc;">
+		<div class="logo_box" style="
+    text-align: center;
+">
+		<img src="https://www.fabmarket.in/pub/media/logo/default/FAB-Logo3_427a0da7f8f2e776a6ea484887e22ccc.jpg" class="logo" style="
+    width: 172px;
+    margin: 10px 0 0 0;
+">
+		</div>
+	</div>
+	<div class="middle_section" style="
+    text-align: center;
+">
+		<h1 style="
+    margin: 30px 0 0 0;
+    color: #000;
+    font-size: 24px;
+">Hi FAB Market,</h1>
+		<p style="
+    color: #8f8f8f;
+    font-size: 16px;
+    margin: 10px auto 0 auto;
+    width: 50%;
+    line-height: 23px;
+"><b style="
+    color: #000;
+">{{trans "%customer_name," customer_name=$myvar3}}</b> has just uploaded a product on the FAB Market product management portal.</p>
+		<div class="info_box" style="
+    text-align: center;
+    margin: 30px 0 0 0;
+">
+			<table border="1px" align="center" width="60%" cellpadding="10px" style="
+    border-collapse: collapse;
+    font-size: 14px;
+    color: #8f8f8f;
+">
+				<tbody><tr style="
+    background: #c60039;
+    color: #fff;
+">
+					<th colspan="2" style="
+    font-weight: 100;
+    font-size: 14px;
+    padding: 15px 0;
+">PRODUCT ADD REQUEST</th>
+				</tr>
+				<tr>
+					<td width="150px" style="
+    background: #f8f8f8;
+">Product Name
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar1}}
+				</td></tr>
+				<tr>
+					<td style="
+    background: #f8f8f8;
+">Category
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar2}}
+				</td></tr>
+				
+					<td style="
+    background: #f8f8f8;
+">Description
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">Vidya Balan gets under the skin of her character "Human-Computer" Shankuntala Devi. The film if released on OTT platform. Vidya Balan shares some BTS memories of the film and a lot more.
+				</td></tr>
+				
+			</tbody></table>
+		</div>
+		<p style="
+    color: #8f8f8f;
+    font-size: 16px;
+    margin: 20px 0 30px 0;
+">We request you to kindly take an action on the same.</p>
+		<span style="
+    background: #c60039;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 60px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+">THANK YOU</span>
+	</div>
+</div>
+
+</body></html>
+
+<!--{{template config_path="design/email/header_template"}}
+
+<table>
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">{{trans "%customer_name," customer_name=$myvar3}}</p>
+            <p>
+                {{trans "%seller_message" seller_message=$myvar4}}
+            </p>
+        </td>
+    </tr>
+    <tr class="email-summary">
+        <td>
+        </td>
+    </tr>
+    <tr class="email-information">
+        <td>
+            <table class="product-details">
+                <thead>
+                    <tr>
+                        <th align="left" width="325" bgcolor="#EAEAEA" style="font-size:13px; padding:5px 9px 6px 9px; line-height:1em;">{{trans "Product Name"}}</th>
+                        <th width="10"></th>
+                        <th align="left" width="325" bgcolor="#EAEAEA" style="font-size:13px; padding:5px 9px 6px 9px; line-height:1em;">{{trans "Category"}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td valign="top" style="font-size:12px; padding:7px 9px 9px 9px; border-left:1px solid #EAEAEA; border-bottom:1px solid #EAEAEA; border-right:1px solid #EAEAEA;">
+                           {{var myvar1}}
+                        </td>
+                        <td>&nbsp;</td>
+                        <td valign="top" style="font-size:12px; padding:7px 9px 9px 9px; border-left:1px solid #EAEAEA; border-bottom:1px solid #EAEAEA; border-right:1px solid #EAEAEA;">
+                           {{var myvar2}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+             <br/>
+               <p>{{trans "Please approve the product as soon as possible."}}</p>
+        </td>
+        <tr>
+            <td bgcolor="#EAEAEA" align="center" style="background:#EAEAEA;text-align:center;">
+                <center>
+                    <p style="font-size:12px;margin:0;">
+                        <strong>{{trans "Thank you"}}</strong>
+                    </p>
+                </center>
+            </td>
+        </tr>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}-->

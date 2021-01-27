@@ -1,0 +1,136 @@
+<!--
+/**
+ * Webkul Software.
+ *
+ * @category  Webkul
+ * @package   Webkul_Marketplace
+ * @author    Webkul
+ * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+-->
+<!--@subject Become Seller Request  @-->
+<!--@vars {
+"var this.getUrl($store, 'customer/account/')":"Customer Account URL",
+"var customer.email":"Customer Email",
+"var customer.name":"Customer Name"
+} @-->
+
+
+<html><head>
+	<title>New Vendor</title>
+</head>
+<body style="
+    margin: 0;
+    background: whitesmoke;
+    font-family: sans-serif;
+">
+<div class="mailer_body" style="
+    width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding-bottom: 50px;
+">
+	<div class="top_section" style="background-image:url(http://3.6.21.143/pub/media/mailer-image/vendor_header.jpg);height: 154px;border-bottom: 2px solid #dcdcdc;">
+		<div class="logo_box" style="
+    text-align: center;
+">
+		<img src="https://www.fabmarket.in/pub/media/logo/default/FAB-Logo3_427a0da7f8f2e776a6ea484887e22ccc.jpg" class="logo" style="
+    width: 172px;
+    margin: 10px 0 0 0;
+">
+		</div>
+	</div>
+	<div class="middle_section" style="
+    text-align: center;
+">
+		<h1 style="
+    margin: 30px 0 0 0;
+    color: #000;
+    font-size: 24px;
+">Hi Admin,</h1>
+		<p style="
+    color: #8f8f8f;
+    font-size: 16px;
+    margin: 10px 0 0 0;
+">
+{{trans "This is to inform you that "}}{{var myvar1}}{{trans " has requested to become a Seller on FAB Market."}}</p>
+		<div class="info_box" style="
+    text-align: center;
+    margin: 30px 0 0 0;
+">
+			<table border="1px" align="center" width="60%" cellpadding="10px" style="
+    border-collapse: collapse;
+    font-size: 14px;
+    color: #8f8f8f;
+">
+				<tbody><tr style="
+    background: #c60039;
+    color: #fff;
+">
+					<th colspan="2" style="
+    font-weight: 100;
+    font-size: 14px;
+    padding: 15px 0;
+">REGISTRATION REQUEST</th>
+				</tr>
+				<tr>
+					<td style="
+    background: #f8f8f8;
+">Full Name
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar1}}
+				</td></tr>	
+
+<tr>
+					<td style="
+    background: #f8f8f8;
+">Company Name
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar12}}
+				</td></tr>		
+
+<tr>
+					<td style="
+    background: #f8f8f8;
+">Website Name
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar13}}
+				</td></tr>	
+
+<tr>
+					<td style="
+    background: #f8f8f8;
+">Country
+					</td><td style="
+    color: #000;
+    font-weight: 600;
+">{{var myvar14}}
+				</td></tr>					
+			
+			</tbody></table>
+		</div>
+		<p style="
+    color: #8f8f8f;
+    font-size: 16px;
+    margin: 20px 0 30px 0;
+"> Request you to kindly take an action on the same within 24 hours</p>
+		<a href="{{var myvar2}}" style="
+    background: #c60039;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 60px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+">{{trans " CLICK HERE"}}</a>
+	</div>
+</div>
+
+</body></html>

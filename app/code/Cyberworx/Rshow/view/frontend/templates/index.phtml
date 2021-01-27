@@ -1,0 +1,151 @@
+<div class="product_slider">
+<div class="owl-carousel owl-theme products product-items">
+<?php
+$product_collection=$block->getBestsellerProduct();
+//$wishlistHelper=$block->checkWishlist();
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+foreach ($product_collection as $item)
+{
+	$pid=$item->getProductId();
+	$_mySampleaudio = $block->getSampleCollection($pid); 
+	/*$wishlistCollection=$wishlistHelper->getWishlistItemCollection()->addFieldToFilter('product_id', $pid);
+	foreach ($wishlistCollection as $_wishlist_item) {
+	   $in_wishlist = false;
+	   if ($pid == $_wishlist_item->getProduct()->getId()) {
+		   $in_wishlist = true; break;
+	   }
+	}
+	echo $in_wishlist;
+	die("present");*/
+	
+	$product = $objectManager->create('Magento\Catalog\Model\Product')->load($pid);	
+	//print_r("===".$product->getTags());
+	
+	$pvisibility=$product->getVisibility();
+	$pname=$item->getProductName();	
+	if($product->getSpecialPrice()>0)
+	{
+		$pprice= number_format($product->getSpecialPrice(),2);
+	}else
+	{
+		$pprice= number_format($product->getPrice(),2);
+	}
+	//$pprice=$product->getPrice();
+	//echo "<br>";
+	//print_r($item->getName());
+	//print_r("--->".$product->getImage());	
+	$image_url = $block->imageHelperObj()->init($product, 'product_page_image_small')->setImageFile($product->getFile())->resize($this->getProductimagewidth(),$this->getProductimageheight())->getUrl();
+	if($product->getName()!="" && $pvisibility==4){
+?>	
+<div class="new_product_box">
+<div class="new_custom_product_img_box product-item-top">
+	<img src="pub/media/images/play-icon.svg" width="65" height="65" alt="audio plyer" class="play fab_play dev_product_play" data-audio="<?php echo $_mySampleaudio; ?>">
+	<a href="/<?php echo $product->getUrlKey(); ?>" >
+	<img src="<?php echo $image_url; ?>" />
+	<p><?php echo $pname; ?></p>
+	</a>
+	<div class="button-top-wrap">
+	<a href="<?php echo $block->getUrl('wishlist', ['_secure' => true]);?>" img src="<?php echo $block->getViewFileUrl('images/wish_icon.jpg'); ?>" data-post='<?php  echo $this->helper('Magento\Wishlist\Helper\Data')->getAddParams($product) ?>' class="action towishlist" data-action="add-to-wishlist"><span>' . __('Add to Wish List') . '</span></a>
+</div>
+</div>
+<div class="new_custom_product_desp_box">
+	<div class="product_desp"><?php echo $product->getShortDescription(); ?></div>
+	<div class="product_price_"><?php echo "$".$pprice; ?> <span>onwards</span></div>
+</div>
+	
+</div>	
+<?php }} 
+?>
+
+<!--wishlist item-->
+	<?php	
+		$customerid=$block->checkLoginuser();
+		$productids=$block->checkWishlistitem($customerid);
+		//print_r($productids);
+		//die("working");
+		foreach ($productids as $pid)
+		{
+			$product = $objectManager->create('Magento\Catalog\Model\Product')->load($pid);
+			$pvisibility=$product->getVisibility();
+			$_mySampleaudio = $block->getSampleCollection($pid); 
+			$pname=$product->getName();	
+			if($product->getSpecialPrice()>0)
+			{
+				$pprice= number_format($product->getSpecialPrice(),2);
+			}else
+			{
+				$pprice= number_format($product->getPrice(),2);
+			}
+			//$pprice=$product->getPrice();
+			//echo "<br>";
+			//print_r($item->getName());
+			//print_r("--->".$product->getImage());	
+			$image_url = $block->imageHelperObj()->init($product, 'product_page_image_small')->setImageFile($product->getFile())->resize($this->getProductimagewidth(),$this->getProductimageheight())->getUrl();
+			if($product->getName()!="" && $pvisibility==4){
+			?>	
+			
+	<div class="new_product_box">
+<div class="new_custom_product_img_box product-item-top">
+	<img src="pub/media/images/play-icon.svg" width="65" height="65" alt="audio plyer" class="play fab_play dev_product_play" data-audio="<?php echo $_mySampleaudio; ?>">
+	<a href="/<?php echo $product->getUrlKey(); ?>" >
+	<img src="<?php echo $image_url; ?>" />
+	<p><?php echo $pname; ?></p>
+	</a>
+	<div class="button-top-wrap">
+	<a href="<?php echo $block->getUrl('wishlist', ['_secure' => true]);?>" img src="<?php echo $block->getViewFileUrl('images/wish_icon.jpg'); ?>" data-post='<?php  echo $this->helper('Magento\Wishlist\Helper\Data')->getAddParams($product) ?>' class="action towishlist" data-action="add-to-wishlist"><span>' . __('Add to Wish List') . '</span></a>
+</div>
+</div>
+<div class="new_custom_product_desp_box">
+	<div class="product_desp"><?php echo $product->getShortDescription(); ?></div>
+	<div class="product_price_"><?php echo "$".$pprice; ?><span>onwards</span></div>
+</div>
+	
+</div>	
+			<?php }
+		}
+	?>
+	
+<!--wishlist item-->
+</div>
+</div>
+<script>
+require(['jquery','owlcarousel'], function($){
+$('.product-items').owlCarousel({ 
+loop:true, 
+autoplay:true,
+margin:30,
+dots:false, 
+nav:true, 
+responsive:{ 
+0:{ 
+items:1,
+dots:false,
+}, 
+600:{ 
+items:2.5,
+dots:false, 
+}, 
+1280:{ 
+items:3.5,
+dots:false, 
+},
+1366:{ 
+items:4.5,
+dots:false, 
+},
+1420:{ 
+items:4.5,
+dots:false,
+},
+1600:{ 
+items:5.5,
+dots:false,
+},
+1900:{ 
+items:5.5,
+dots:false,
+}
+} 
+});  
+}); 
+   </script>

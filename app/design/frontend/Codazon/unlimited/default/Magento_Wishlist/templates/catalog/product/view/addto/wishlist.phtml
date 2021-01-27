@@ -1,0 +1,43 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\Wishlist\Block\Catalog\Product\View\Addto\Wishlist */
+?>
+<?php if ($block->isWishListAllowed()) : ?>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+$product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');//get current product
+
+if($customerSession->isLoggedIn()) {
+ $in_wishlist = 0;
+$idsss =  $customerSession->getCustomerID();
+    $wishlist            = $objectManager->get('\Magento\Wishlist\Model\Wishlist');
+    $wishlistCollection = $wishlist->loadByCustomerId($idsss, true)->getItemCollection();    
+foreach ($wishlistCollection as $_wishlist_item) {
+  
+   if ($product ->getId() == $_wishlist_item->getProduct()->getId()) {
+      $in_wishlist = 1; 
+   break;
+   }
+}
+}
+?>
+
+    <button href="#"
+       class="action towishlist <?php if($customerSession->isLoggedIn()) { if($in_wishlist ==1){ echo 'already_in_wishlist';} } ?>"
+       data-post='<?php /* @escapeNotVerified */ echo $block->getWishlistParams(); ?>'
+       data-action="add-to-wishlist"><?php /* @escapeNotVerified */ echo __('Add to Wish List') ?></button>
+<?php endif; ?>
+<script type="text/x-magento-init">
+    {
+        "body": {
+            "addToWishlist": <?php /* @escapeNotVerified */ echo $block->getWishlistOptionsJson() ?>
+        }
+    }
+</script>

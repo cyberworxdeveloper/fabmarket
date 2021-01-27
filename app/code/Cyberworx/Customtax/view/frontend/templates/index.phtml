@@ -1,0 +1,28 @@
+<?php
+// Get all visible items in cart
+$quote = $block->getQuoteData();
+
+/*foreach($quote->getAllVisibleItems() as $_item) {
+    //echo "<pre>";print_r($_item->debug());
+    echo 'ID: '.$_item->getProductId().'<br/>';
+    echo 'Name: '.$_item->getName().'<br/>';
+    echo 'Sku: '.$_item->getSku().'<br/>';
+    echo 'Quantity: '.$_item->getQty().'<br/>';
+    echo 'Price: '.$_item->getPrice().'<br/>';
+    echo 'Product Type: '.$_item->getProductType().'<br/>';
+    echo 'Discount: '.$_item->getDiscountAmount();echo "<br/>";
+    echo "<br/>";
+}*/
+// Get total items and total quantity in current cart
+/*echo $totalItems = $quote->getItemsCount();echo "<br/>";
+echo $totalQuantity = $quote->getItemsQty();echo "<br/>";
+
+//Get subtotal and grand total of customer current cart
+echo $subTotal = $quote->getSubtotal();echo "<br/>";
+echo $grandTotal = $quote->getGrandTotal();echo "<br/>";
+*/
+//Get billing and shipping addresses of current cart
+$billingAddress = $quote->getBillingAddress();
+echo "<pre>";print_r($billingAddress->getData('address_id'));
+/*$shippingAddress = $quote->getShippingAddress();
+echo "<pre>";print_r($billingAddress->getData());*/

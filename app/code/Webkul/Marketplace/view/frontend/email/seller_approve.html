@@ -1,0 +1,90 @@
+<!--
+/**
+ * Webkul Software.
+ *
+ * @category  Webkul
+ * @package   Webkul_Marketplace
+ * @author    Webkul
+ * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+-->
+<!--@subject Seller Approval Notification  @-->
+<!--@vars {
+"var this.getUrl($store, 'customer/account/')":"Customer Account URL",
+"var customer.email":"Customer Email",
+"var customer.name":"Customer Name"
+} @-->
+
+
+<html><head>
+	<title>New Vendor</title>
+</head>
+<body style="
+    margin: 0;
+    background: whitesmoke;
+    font-family: sans-serif;
+">
+<div class="mailer_body" style="
+    width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding-bottom: 50px;
+">
+	<div class="top_section" style="background-image:url(http://3.6.21.143/pub/media/mailer-image/vendor_header.jpg);height: 154px;border-bottom: 2px solid #dcdcdc;">
+		<div class="logo_box" style="
+    text-align: center;
+">
+		<img src="https://www.fabmarket.in/pub/media/logo/default/FAB-Logo3_427a0da7f8f2e776a6ea484887e22ccc.jpg" class="logo" style="
+    width: 172px;
+    margin: 10px 0 0 0;
+">
+		</div>
+	</div>
+	<div class="middle_section" style="
+    text-align: center;
+    padding: 30px 0;
+">
+	<img src="http://3.6.21.143/pub/media/mailer-image/correct.png">
+
+		<h1 style="
+    margin: 20px 0 15px 0;
+    color: #000;
+    font-size: 24px;
+">Congrats {{trans "%customer_name" customer_name=$myvar1}}</h1>
+		<div class="col-md-6" style="
+    width: 50%;
+    margin: 0 auto;
+"><p style="
+    color: #8f8f8f;
+    font-size: 16px;
+    margin: 10px 0 40px 0;
+    line-height: 22px;
+"><b style="
+    color: #000;
+    font-weight: 600;
+">{{trans "%customer_name," customer_name=$myvar4}}</b> has been successfully registered as a seller on <a href="http://3.6.21.143/" target="_blank" style="
+    color: #cf4347;
+    text-decoration: none;
+    font-weight: 600;
+">fabmarket.in</a>. Now you can start uploading your products with the help of FAB Market product management portal. Welcome to the world of endless possibilties.</p></div>
+		<div class="info_box" style="
+    text-align: center;
+    margin: 30px 0 0 0;
+">
+			
+		</div>
+
+		<a href="http://3.6.21.143/?vendorlogin" style="
+    background: #c60039;
+    color: #fff;
+    text-decoration: none;
+    padding: 15px 60px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+">UPLOAD PRODUCT</a>
+	</div>
+</div>
+
+</body></html>

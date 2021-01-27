@@ -1,0 +1,88 @@
+<?php
+/**
+ * Copyright © 2017 Codazon, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Customer\Block\Form\Login $block */
+?>
+<?php
+/**
+ * Customer login form template
+ *
+ * @see \Magento\Customer\Block\Form\Login
+ * @var $block \Magento\Customer\Block\Form\Login
+ */
+?>
+<!-- login style default - wishlist -->
+<?php
+$uniqid = "msp-recaptcha-".uniqid();
+?>
+<div class="account-info-summary">
+<button class="action-close" id="wishlogin_pop" type="button">
+                <span>Close</span>
+            </button>
+<div class="logo_section">
+					<img src="<?php echo $block->getBaseUrl(); ?>pub/media/logo/default/FAB-Logo3.jpg">
+				
+				</div>
+    <div class="info-summary-top">
+        <div class="md-content">
+            <?= $this->getBlockHtml('mageplaza-social-login-buttons') ?>
+            <form name="loginForm" action="<?php echo $block->escapeUrl($block->getPostActionUrl()) ?>" method="post" data-mage-init='{"themewidgets":{"codazon.customValidation": {}}}'>
+			<h2>Login to continue</h2>
+                <?php echo $block->getBlockHtml('formkey'); ?>
+                <?= $this->getChildHtml('form_additional_info') ?>
+                <div class="md-block">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded">
+                        <input class="mdl-textfield__input" type="text" name="login[username]" data-validate='{"required":true, "email":true}' />
+                        <label class="mdl-textfield__label"><?php echo __('Email ID') ?></label>
+                    </div>
+                </div>
+                <div class="md-block">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label is-upgraded">
+                        <input class="mdl-textfield__input" name="login[password]" type="password" data-validate='{"required":true}' />
+                        <label class="mdl-textfield__label"><?php echo __('Password') ?></label>
+                    </div>
+					
+				<a class="action remind wishlist_forgot" href="" id="customer-popup-forget"><span>Forgot Password?</span></a>
+                </div>
+                <?php if ($captcha = $this->getLayout()->getBlock('mini-login-msp-recaptcha')) : ?>
+                <?= $captcha->setCustomRecaptchaId($uniqid)->toHtml(); ?>
+                <?php endif ?>
+                <div data-mage-init='{"themewidgets":{"codazon.ajaxcontent": {"ajaxUrl": "<?= $this->getUrl('themelayoutpro/ajax/captcha') ?>", "cache": false}}}'></div>
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect fab_input submit fab-btn" type="submit">
+                        <?php echo __('Login') ?>
+                        </button>
+                    </div>
+                    <div class="secondary">
+					<!--<a class="action remind" href="<?php// echo $block->escapeUrl($block->getForgotPasswordUrl()) ?>"><span><?php// echo __('Forgot Your Password?'); ?></span></a>-->
+					
+					
+					</div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="info-summary-bottom">
+        <div class="md-content">
+           <!-- <p class="secondary"><span class="create-account-question"><?php //echo __('New customer?') ?></span> 
+	
+		<a class="create-account-link" href="<?php// echo $block->getUrl('customer/account/create'); ?>"><?php// echo __('Start Here.') ?></a></p>-->
+	<div class="secondary"> Don't have an account? <a class="action remind wishlist_register" href="<?php echo $block->getBaseUrl(); ?>customer/account/create/" id="customer-popup-registration"><span>Register Now</span></a></div>
+        </div>
+    </div>
+</div>
+<script>
+require([
+    'jquery',
+], function($){
+    if ($('#<?= $uniqid ?>-container').length && ($.fn.applyBindings != undefined)) {
+        $('#<?= $uniqid ?>-container').applyBindings();
+    }
+});
+</script>

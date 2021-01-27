@@ -1,0 +1,873 @@
+<?php
+$per_page=6;
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');//get current product
+
+$product_detail_type= $product->getResource()->getAttribute('product_detail_type')->getFrontend()->getValue($product); 
+/*$file = fopen("/var/www/html/fabmarket/pub/media/test.txt","w");
+echo fwrite($file,$product->getData());
+fclose($file);
+echo "<pre>";*/
+
+$product_title=$product->getName();
+
+$product_id=$product->getId();
+
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+$connection = $resource->getConnection();
+
+$sql= "SELECT  mg_marketplace_userdata.company_locality,mg_marketplace_userdata.shop_title from mg_marketplace_userdata  left join mg_marketplace_product on mg_marketplace_product.seller_id=mg_marketplace_userdata.seller_id where mg_marketplace_product.mageproduct_id='".$product_id."'";
+$result = $connection->fetchAll($sql);
+//echo $sql;
+//print_r();
+//die;
+
+  /* SET shop_title='".$shoptitle."',company_locality='".$company_address."',shop_website='".$companywebsite."',shop_gst='".$shop_gst."',country_pic='".$country_pic."' ,contact_number='".$contact_number."',mobile_no='".$mobile_io."',shop_pan='".$shop_pan."' WHERE seller_id='".$entity_id."'";
+$connection->query($sql);*/
+
+
+
+$blockObj= $block->getLayout()->createBlock('Magento\Catalog\Block\Product\View');
+$customer_id=$blockObj->getCurrentCustomerId();
+if($customer_id)
+{
+	$resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+	$connection = $resource->getConnection();
+	$tableName = $resource->getTableName('mg_browsinghistory_index');
+	$sql = "Insert Into " . $tableName . " (customerid , productid) Values ('".$customer_id."','".$product_id."')";
+	$connection->query($sql);
+}
+?>
+<script>
+var productid;
+var gpid=localStorage.getItem("productid");
+if(gpid)
+{
+	productid="<?php echo $product_id; ?>,";
+	var res=gpid.concat(productid);
+	localStorage.setItem("productid", res);
+}
+else{
+	productid="<?php echo $product_id; ?>,";
+	localStorage.setItem("productid", productid);
+}
+
+</script>
+<?php  
+$product = $objectManager->get('\Magento\Catalog\Model\Product')->load($product->getId());
+			   
+$customOptions = $objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($product);
+$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface'); 
+$productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+
+$opt=$customOptions->getData();
+$total_record=0;
+
+$session =  $objectManager->get("Magento\Checkout\Model\Session");
+$quote =$session->getQuote();
+$qty =  $quote->getItemsSummaryQty();
+$all_tems = $quote->getAllItems();
+
+$produt_arr=array();
+foreach($all_tems as $item) 
+    {
+		$produt_arr[]=$item->getProductId();
+    }
+
+
+
+
+
+$checkout_link=$storeManager->getStore()->getUrl('checkout/cart', ['_secure' => true]);
+$listBlock = $objectManager->get('\Magento\Catalog\Block\Product\View');
+
+$total_bite=0;
+
+#checkwishlist in detail page
+$wishlistHelper = $this->helper('Magento\Wishlist\Helper\Data');
+$wishlistCollection = $wishlistHelper->getWishlistItemCollection();     
+foreach ($wishlistCollection as $_wishlist_item) {
+	$in_wishlist = 0;
+   if ($product->getId() == $_wishlist_item->getProduct()->getId()) {
+       $in_wishlist = 1; 
+   break;
+   }
+}
+
+
+
+//if(count($customOptions)>0)
+{
+	
+	
+	
+	foreach($customOptions as $opt)
+	{
+	 $total_bite=count($opt->getValues());
+	}
+
+	
+	if($product_detail_type=='Artists')
+	{?>
+	<article>
+		
+	   <div class="container-fluid">
+	   <div class="container show_tab_slider space">
+		  <div class="row">
+			 <div class="col-md-6">				 
+				   <div class="product_sidebar">
+				   
+
+					<?php
+					$imageUrl = $product->getMediaConfig()->getMediaUrl($product->getImage());
+		
+					
+					?>	
+					   
+					   
+					   <div class="fab_product_block no_hover">
+                                <div class="img_box pro_img">
+                                <span class="fab_wishlish"> <a href="#" data-post='<?php  echo $this->helper('Magento\Wishlist\Helper\Data')->getAddParams($product) ?>' class="action towishlist <?php if($in_wishlist ==1){ echo 'already_in_wishlist';} ?>" data-action="add-to-wishlist"><i class="fa fa-heart-o"></i></a></span>
+							
+                                  <img src="<?php echo $imageUrl;?>">
+                                </div>
+                            </div>
+					   
+					   <div class="fab_Seasons">
+                            <p class="sml_heading"><?php echo $total_bite?> Bytes</p>
+							<p class="fab_text"><?php echo $product->getShortDescription();?></p>
+							
+						</div>
+
+					<div class="fab_accordion_tab" data="feature">
+						<p class="sml_heading">View More Details <i class="fa fa-angle-down"></i></p>
+					</div>
+					<div class="fab_accordion_content" data="feature" style="display: block;">
+						<ul class="features">
+							<?php $audio_files= $product->getResource()->getAttribute('audio_files')->getFrontend()->getValue($product); ?>
+							<?php if($audio_files !=''){ ?>
+							<li><div>Audio Files</div><span><?php echo $audio_files ?></span></li>
+							<?php } ?>
+							
+							<?php  $bit_rate= $product->getResource()->getAttribute('bit_rate')->getFrontend()->getValue($product); ?>
+							<?php if($bit_rate !=''){ ?>
+							<li><div>Bit Rate</div><span> <?php echo $bit_rate ?> </span></li>
+							<?php } ?>
+							<?php $episode_duration= $product->getResource()->getAttribute('episode_duration')->getFrontend()->getValue($product); ?>
+							<?php if($episode_duration !=''){ ?>
+							<li><div>Episode Duration</div><span><?php echo $episode_duration ?> </span></li>
+							<?php } ?>
+							<?php $target_audience= $product->getResource()->getAttribute('target_audience')->getFrontend()->getValue($product); ?>
+							<?php if($target_audience !=''){ ?>
+							<li><div>Target Audience</div><span><?php echo $target_audience ?> </span></li>
+							<?php } ?>
+                                                                           
+
+						</ul>
+					</div>
+					   
+					   
+					   
+					   
+					<?php
+					  $ingredient_title1= $product->getResource()->getAttribute('tags')->getFrontend()->getValue($product);
+					  //print_r($ingredient_title1);
+					  $arraytags = explode(",",$ingredient_title1);
+					?>
+					<p class="sml_heading">Tags</p>
+					<ul class="fab_tags">
+						<?php 
+						foreach ($arraytags as $tags) { ?>
+						<li><a href="<?php echo $block->getBaseUrl(); ?>catalogsearch/result/?q=<?php echo $tags ?>" class="fab-btn effect-1"><?php echo $tags ?></a></li>
+					<?php } ?>
+					</ul>
+					</div>
+			</div>   
+			<div class="col-md-18">
+				
+				<div class="subscription_content">
+							<h2><?php echo $product_title;?></h2>
+						</div>
+				
+			<?php 
+		
+	
+			 $i=0;
+			 foreach ($customOptions as $option) {
+				$opt=$option->getData();
+				$title=$opt['default_title'];
+				$id=$opt['option_id'];
+				 $cls='';
+				 if($i==0)
+				 {
+					 $cls=' active';
+				 }
+				 $i++;
+			?>
+			    <div class="fab_tab_content episode-list <?php echo $cls;?>" id="episode_list_<?php echo $id?>" data="<?php echo $id?>">
+					<?php
+				
+				
+								
+				 
+				 
+				     		  $precord=0;
+				 			  $total_record=count($option->getValues());
+							
+						foreach ($option->getValues() as $value) {
+							
+							
+							
+							if($precord<$per_page)
+							{
+								
+								$val=$value->getData();
+								
+								
+								try {
+									$product = $productRepository->get($val['sku']);
+								
+								    $mediaUrl='';
+								
+									 if ($product->getExtensionAttributes() && $product->getExtensionAttributes()->getDownloadableProductSamples()) {
+											foreach ($product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+												
+												if($links->getSampleUrl()!='')
+														{
+															$mediaUrl=$links->getSampleUrl();
+														}else
+												{
+												
+															$mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+												}
+														
+												 break;
+											}
+										}
+
+										
+										
+								
+								
+								
+								/*
+									echo $product->getEntityId() . '<br>';
+									echo $product->getName() . '<br>';
+									echo $product->getSKU() . '<br>';
+									echo $product->getPrice() . '<br>';
+									echo $product->getSpecialPrice() . '<br>';
+									echo $product->getTypeId() . '<br>';
+									echo $product->getProductUrl() . '<br>';
+									*/							
+							
+									$productid = $product->getId();
+									//$cartHelper = $this->helper('Magento\Checkout\Helper\Cart');
+									//$addToCartUrl = $cartHelper->getAddUrl($product);
+								
+								
+									
+									$imageUrl = $product->getMediaConfig()->getMediaUrl($product->getImage());
+								
+								
+									
+								?>
+					
+								<div class="fab_episode_block"  >
+								 <!-- <div class="pro_img">
+									 <a class="devtest" href="#"><img src="<?php echo $imageUrl;?>"></a>
+								  </div>-->
+								  <div class="pro_content">
+									 <p class="sub_head"><?php echo $product->getName();?> </p>
+									 <p class="wish_price">
+										 <?php
+										 if($mediaUrl!='')
+										 {
+											 ?>
+										 <button type="button" class="play_music audio_play sample_artist" data-mediaurl="<?php echo $mediaUrl;?>" data-music="audio5"><i class="fa fa-play"></i>Preview Sample</button>
+										 <?php
+										 }
+										?>
+										 Price: <span>
+										 <?php echo "$".number_format($product->getPrice(),2); ?>
+										 <?php //echo $listBlock->getProductPrice($product); ?>
+										 </span></p>
+									 <div class="season_content"><?php echo $product->getShortDescription();?></div>
+								  </div>
+									
+									
+									
+									
+											<?php 
+											
+											$addToCartUrl =  $listBlock->getAddToCartUrl($product);
+											$postDataHelper = $this->helper('Magento\Framework\Data\Helper\PostHelper');
+											$postData = $postDataHelper->getPostData($block->getAddToCartUrl($product), ['product' => $productid]);
+											?>
+
+											<form data-role="tocart-form" action="<?php echo $addToCartUrl; ?>" method="post"> 
+											<?php echo $block->getBlockHtml('formkey')?>
+												
+												<?php
+												$added='display:none';
+												$cart_btn='';
+												if(in_array($productid,$produt_arr))
+												{
+													$added='';
+													$cart_btn='display:none';
+												}
+												?>
+											<div  class="pro_cart">
+												<span class="added-class" style="<?php echo $added;?>">Added</span>
+											<button type="submit"  title="Add to Cart" class="fab-btn effect-1 add_to_cart_item" style="<?php echo $cart_btn;?>">
+											<span>Add to Cart</span>
+											</button>
+												<!--
+												<span class="fab_wishlish artist"> <a href="#" data-post='<?php  echo $this->helper('Magento\Wishlist\Helper\Data')->getAddParams($product) ?>' class="action towishlist <?php if($in_wishlist ==1){ echo 'already_in_wishlist';} ?>" data-action="add-to-wishlist"><i class="fa fa-heart-o"></i></a></span>-->
+												
+												
+												
+												
+											</div>   
+											</form>
+									
+									
+									
+							   </div>
+			 
+								<?php
+												$precord++;
+						} catch (\Magento\Framework\Exception\NoSuchEntityException $e){
+									// insert your error handling here
+								}
+								
+							}
+						}
+						?>
+				 </div>
+			 <?php
+			}
+		
+		
+		
+			?>
+			<div class="fab_pagination" style="display:block!important">
+				<?php
+		         if($total_record>$per_page)
+				 {
+					 $no_of_pages=ceil($total_record/$per_page);
+					?>
+				<ul class="artist-ul">
+					<?php
+					 for($k=1;$k<=$no_of_pages;$k++)
+					 {
+					 ?>
+					<li><a href="javascript:void(0)" data-pageid='<?php echo $id?>' data-page='<?php echo $k?>' data-product='<?php echo $product_id?>' class="page-class-artist <?php  if($k==1) echo ' active'?>"><?php echo $k;?></a></li>
+					<?php
+					 }
+					 ?>
+				</ul>
+				<?php
+					}
+					?>
+				
+			</div>
+				
+				
+	        <button type="button" class="fab-btn buy-now cart-btn go-to-cart" <?php if($qty==0) echo 'disabled';?>>
+				
+				<a href="<?php echo $checkout_link;?>">Go to cart</a>
+				</button>
+	        <div class="col-md-24 text-center mt-5">
+			<a href="<?php echo $storeManager->getStore()->getUrl();?>" class="btn_all">Continue Shopping <i class="fa fa-angle-right"></i></a>
+			</div>
+         </div>
+		</div>
+   </div>
+</article> 
+<?php }
+else {?>	
+		
+		
+<?php
+	
+$mediaUrl='';
+
+ if ($product->getExtensionAttributes() && $product->getExtensionAttributes()->getDownloadableProductSamples()) {
+		foreach ($product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+			if($links->getSampleUrl()!='')
+			{
+				$mediaUrl=$links->getSampleUrl();
+			}else{
+			 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+			}
+			
+			 break;
+		}
+	}
+	
+	
+?>
+<article>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+
+$customerSession = $objectManager->create("Magento\Customer\Model\Session");
+$currentuser ='';
+if($customerSession->isLoggedIn()){
+  $currentuser=$customerSession->getCustomerId();
+}
+?>
+
+   <div class="container-fluid  hi">
+   <div class="container show_tab_slider space">
+      <div class="row">
+         <div class="col-md-6">
+			 <?php
+										 if($mediaUrl!='')
+										 {
+											 ?>
+										 <button type="button" class="play_music audio_play sample_music" data-mediaurl="<?php echo $mediaUrl;?>" data-music="audio5"><i class="fa fa-play"></i>Preview Sample</button>
+										 <?php
+										 }
+										?>
+			 
+             <!--<button type="button" class="play_music audio_play sample_music" data-music="audio5"><i class="fa fa-play"></i>Preview Sample</button>-->
+			   <div class="product_sidebar">
+               <div class="fab_Seasons">
+			  
+		<p><?php if(isset($result[0]["shop_title"])){ echo $result[0]["shop_title"];} ?></p>
+   <p class="sml_heading">Seasons</p>
+                  <ul>
+<?php					  
+
+ $i=0;
+ $total = 0;
+$tot_episide_list=0;
+foreach ($customOptions as $option) {
+// 	echo '<pre>';
+// 	print_r($option->getData());
+	$opt=$option->getData();
+	 $count_episode=count($option->getValues());
+	$tot_episide_list+=$count_episode;
+	$title=$opt['default_title'];
+/*
+      $array = explode("|",$title);
+      $episode= trim($array[1],"Episode(s)");
+      $str = trim(preg_replace('/\s+/',' ', $episode));
+     $total = $total+$str;
+	
+	*/
+	
+    	$id=$opt['option_id'];
+	 $cls='';
+				 if($i==0)
+				 {
+					 $cls=' active';
+				 }
+				 $i++;
+	
+	?>
+	 <li class="<?php echo $cls;?> fab_tab" data="<?php echo $id;?>"><?php echo ucfirst($title);?> | <?php echo $count_episode.' Episode(s)';?></li>
+	<?php
+}
+
+?>
+			 
+</ul>
+</div>
+<p class="total_episode"  style="display: none;"><?php echo $tot_episide_list;?> Episode(s)</p>
+
+<div class="fab_accordion_tab" data="feature">
+	<p class="sml_heading">View More Details <i class="fa fa-angle-down"></i></p>
+</div>
+<div class="fab_accordion_content" data="feature" style="display: block;">
+	<ul class="features">
+	    <?php $audio_files= $product->getResource()->getAttribute('audio_files')->getFrontend()->getValue($product); ?>
+	    <?php if($audio_files !=''){ ?>
+		<li><div>Audio Files</div><span><?php echo $audio_files ?></span></li>
+		<?php } ?>
+		
+		<?php  $bit_rate= $product->getResource()->getAttribute('bit_rate')->getFrontend()->getValue($product); ?>
+		<?php if($bit_rate !=''){ ?>
+		<li><div>Bit Rate</div><span> <?php echo $bit_rate ?> </span></li>
+		<?php } ?>
+		<?php $episode_duration= $product->getResource()->getAttribute('episode_duration')->getFrontend()->getValue($product); ?>
+		<?php if($episode_duration !=''){ ?>
+		<li><div>Episode Duration</div><span><?php echo $episode_duration ?> </span></li>
+		<?php } ?>
+		<?php $target_audience= $product->getResource()->getAttribute('target_audience')->getFrontend()->getValue($product); ?>
+		<?php if($target_audience !=''){ ?>
+		<li><div>Target Audience</div><span><?php echo $target_audience ?> </span></li>
+		<?php } ?>
+	</ul>
+</div>
+<?php
+$single_episode_duration= $product->getResource()->getAttribute('single_episode_duration')->getFrontend()->getValue($product);
+?>
+<?php if($single_episode_duration !=''){ ?>
+<p class="sml_heading" style="margin-bottom: 8px;">Single Episode Duration</p>
+<p style="font-size: 16px;margin: 0 0 25px 0;"><?php echo $single_episode_duration ?></p>
+<?php } ?>
+
+<?php
+$publisher_name= $product->getResource()->getAttribute('publisher_name')->getFrontend()->getValue($product);
+?>
+<?php if($publisher_name !=''){ ?>
+<p class="sml_heading" style="margin-bottom: 8px;"> Publisher Name :</p>
+<p style="font-size: 16px;margin: 0 0 25px 0;"><?php echo $publisher_name ?></p>
+<?php } ?>
+
+<?php
+
+
+
+  $ingredient_title1= $product->getResource()->getAttribute('tags')->getFrontend()->getValue($product);
+  //print_r($ingredient_title1);
+  $arraytags = explode(",",$ingredient_title1);
+?>
+<p class="sml_heading">Tags</p>
+<ul class="fab_tags">
+    <?php 
+    foreach ($arraytags as $tags) { ?>
+	<li><a href="<?php echo $block->getBaseUrl(); ?>catalogsearch/result/?q=<?php echo $tags ?>" class="fab-btn effect-1"><?php echo $tags ?></a></li>
+<?php } ?>
+</ul>
+</div>	
+		  </div>			 
+			 
+			 
+         <div class="col-md-18">
+			<?php 
+			 $i=0;
+			 foreach ($customOptions as $option) {
+				$opt=$option->getData();
+				$title=$opt['default_title'];
+				$id=$opt['option_id'];
+				 $cls='';
+				 if($i==0)
+				 {
+					 $cls=' active';
+				 }
+				 $i++;
+			?>
+			    <div class="fab_tab_content episode-list <?php echo $cls;?>"  data="<?php echo $id?>">
+					
+					<div id="episode_list_<?php echo $id?>">
+					<?php
+				    
+				 			
+						  $precord=0;
+				 			  $total_record=count($option->getValues());
+							
+						foreach ($option->getValues() as $value) {
+							
+							if($precord<$per_page)
+							{
+							
+							$val=$value->getData();
+								
+								try {
+								$product = $productRepository->get($val['sku']);
+						
+								/*
+									echo $product->getEntityId() . '<br>';
+									echo $product->getName() . '<br>';
+									echo $product->getSKU() . '<br>';
+									echo $product->getPrice() . '<br>';
+									echo $product->getSpecialPrice() . '<br>';
+									echo $product->getTypeId() . '<br>';
+									echo $product->getProductUrl() . '<br>';
+									*/
+							
+							
+											$productid = $product->getId();
+											//$cartHelper = $this->helper('Magento\Checkout\Helper\Cart');
+											//$addToCartUrl = $cartHelper->getAddUrl($product);
+											$listBlock = $objectManager->get('\Magento\Catalog\Block\Product\View');
+											$imageUrl = $product->getMediaConfig()->getMediaUrl($product->getImage());
+								?>
+					
+					
+					
+					
+					
+					
+					
+								<div class="fab_episode_block">
+								    <?php
+	
+$mediaUrlss='';
+
+ if ($product->getExtensionAttributes() && $product->getExtensionAttributes()->getDownloadableProductSamples()) {
+		foreach ($product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+			if($links->getSampleUrl()!='')
+			{
+		       $mediaUrlss=$links->getSampleUrl();
+			}else{
+			 $mediaUrlss= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+			}
+			
+			 break;
+		}
+	}
+	
+	
+?>
+
+                                                                      <div class="pro_img">
+                                                                    <a href="#"><img src="<?php echo $imageUrl;?>">
+                                                            <i class="fa fa-play  fab_play episode_play" data-audio="<?php echo $mediaUrlss ?>"></i></a>
+                                                                     </div>
+                                                                    								  <div class="pro_content">
+									 <p class="sub_head"><?php echo $product->getName();?>
+										 <?php if($dur=$product->getResource()->getAttribute('episode_duration')->getFrontend()->getValue($product)){?>
+										 |<span><?php echo $dur; ?> minutes</span>
+										 <?php } ?>
+									  </p>
+									 <p class="wish_price">Price: <span><?php echo $listBlock->getProductPrice($product); ?></span></p>
+									 <div class="season_content"><?php echo $product->getShortDescription();?></div>
+								  </div>
+									
+									
+									
+									
+											<?php 
+											
+											$addToCartUrl =  $listBlock->getAddToCartUrl($product);
+											$postDataHelper = $this->helper('Magento\Framework\Data\Helper\PostHelper');
+											$postData = $postDataHelper->getPostData($block->getAddToCartUrl($product), ['product' => $productid]);
+											?>
+
+											<form data-role="tocart-form" action="<?php echo $addToCartUrl; ?>" method="post"> 
+											<?php echo $block->getBlockHtml('formkey')?>
+												
+												
+											<?php
+												$added='display:none';
+												$cart_btn='';
+												if(in_array($productid,$produt_arr))
+												{
+													$added='';
+													$cart_btn='display:none';
+												}
+												?>
+											<div  class="pro_cart">
+												<span class="added-class" style="<?php echo $added;?>">Added</span>
+											<button type="submit"  title="Add to Cart" class="fab-btn effect-1 add_to_cart_item" style="<?php echo $cart_btn;?>">
+											<span>Add to Cart</span>
+											</button>
+												
+											</div>   
+											</form>
+							   </div>
+			 
+								<?php
+												
+									$precord++;
+									} catch (\Magento\Framework\Exception\NoSuchEntityException $e){
+											// insert your error handling here
+										}
+								}
+								
+
+						}
+						?>
+					</div>
+					
+					 <div class="fab_pagination" style="display:block!important">
+				<?php
+		         if($total_record>$per_page)
+				 {
+					 $no_of_pages=ceil($total_record/$per_page);
+					?>
+				<ul>
+					<?php
+					 for($k=1;$k<=$no_of_pages;$k++)
+					 {
+					 ?>
+					<li><a href="javascript:void(0)" data-pageid='<?php echo $id?>' data-page='<?php echo $k?>' data-product='<?php echo $product_id?>' class="page-class <?php  if($k==1) echo ' active'?>"><?php echo $k;?></a></li>
+					<?php
+					 }
+					 ?>
+				</ul>
+				<?php
+					}
+					?>
+				
+			</div>
+			
+				 </div>
+			 
+			 <?php
+			}
+			?>
+			 	
+			 
+			 
+	        <button type="button" class="fab-btn buy-now cart-btn go-to-cart" <?php if($qty==0) echo 'disabled';?>>
+				
+				<a href="<?php echo $checkout_link;?>">Go to cart</a>
+				</button>
+			 
+	        <div class="col-md-24 text-center mt-5">
+			<a href="<?php echo $storeManager->getStore()->getUrl();?>" class="btn_all">Continue Shopping <i class="fa fa-angle-right"></i></a>
+			</div>
+         </div>
+      </div>
+   </div>
+</article> 
+<?php
+}
+}
+?>
+
+
+<script>
+require([
+	'jquery',
+	'mage/mage'
+], function ($) { 
+
+
+	
+   $(document).ready(function(){ 
+	   
+	   
+	    $(".page-class").click(function(){
+			
+			var page_id=$(this).data("pageid");
+			var page=$(this).data("page");
+			var product_id=$(this).data("product");
+			 var fkey = jQuery('[name="form_key"]').val();
+			
+			
+			 $(".page-class").removeClass("active");
+			$(this).addClass(' active');
+			
+			
+			
+			 var sendInfo = {
+							   "page_id": page_id,
+								"page": page,
+								"product_id": product_id,
+				 				"fkey":fkey
+						   };
+
+			
+	  				 jQuery.ajax({
+							showLoader: true,
+							url: 'http://3.6.21.143/ajaxpage/page.php',
+							data: sendInfo,
+							type: "POST",
+							dataType: "html",
+							success : function( response ) {
+								//document.getElementById('episode_list_'+page_id).innerHTML =response;
+								
+								//jQuery('episode_list_'+page_id).trigger('contentUpdated');
+								
+								 var htmlObject=jQuery('#episode_list_'+page_id).html(response);
+								
+									htmlObject.find('[data-role=tocart-form], .form.map.checkout').attr('data-mage-init', JSON.stringify({'catalogAddToCart': {}}));             
+									htmlObject.trigger('contentUpdated');
+
+								
+								
+								
+							//alert(response);
+							}
+						});
+			});
+	   
+		$(".page-class-artist").click(function(){
+			
+			var page_id=$(this).data("pageid");
+			var page=$(this).data("page");
+			var product_id=$(this).data("product");
+			 var fkey = jQuery('[name="form_key"]').val();
+			
+			 $(".page-class-artist").removeClass("active");
+
+			$(this).addClass(' active');
+			 var sendInfo = {
+							   "page_id": page_id,
+								"page": page,
+								"product_id": product_id,
+				 				"fkey":fkey
+						   };
+
+			
+	  				 jQuery.ajax({
+							showLoader: true,
+							url: 'http://3.6.21.143/ajaxpage/artist_page.php',
+							data: sendInfo,
+							type: "POST",
+							dataType: "html",
+							success : function( response ) {
+								//document.getElementById('episode_list_'+page_id).innerHTML =response;
+								
+								//jQuery('episode_list_'+page_id).trigger('contentUpdated');
+								
+								 var htmlObject=jQuery('#episode_list_'+page_id).html(response);
+								
+									htmlObject.find('[data-role=tocart-form], .form.map.checkout').attr('data-mage-init', JSON.stringify({'catalogAddToCart': {}}));             
+									htmlObject.trigger('contentUpdated');
+									
+								
+
+								
+								
+								
+							//alert(response);
+							}
+						});
+			});
+   
+	   
+                   
+	   
+	   
+       var temp = $('.total_episode').html();
+       if(temp !="0 Episode(s)"){
+         document.getElementById('total_episode_serires').innerHTML =temp; 
+       }
+       
+            }); 
+   
+	
+	
+	$(".pro_cart").click(function(){
+		
+			//alert("dfds");
+			$(this).find('.add_to_cart_item').hide('slow');	
+			$(this).find('.added-class').show('slow');									
+		    $('.go-to-cart').attr('disabled', false);
+			//$('#btnSubmit').attr("disabled", false);	
+
+		
+		});
+	
+	
+	//mini-cart
+
+});
+</script> 
+	 
+	
+	<script type="text/x-magento-init">
+    {
+        "[data-role=tocart-form], .form.map.checkout": {
+            "catalogAddToCart": {}
+        }
+    }
+</script>
+<script>
+    require([
+        'Magento_Customer/js/customer-data'
+    ], function (customerData) {
+        var sections = ['cart'];
+        customerData.invalidate(sections);
+        customerData.reload(sections, true);
+    });
+</script>

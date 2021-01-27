@@ -1,0 +1,152 @@
+<?php
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_BannerSlider
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+use Mageplaza\BannerSlider\Model\Config\Source\Type;
+
+$banners = $block->getBannerCollection();
+
+if (count($banners)) : ?>
+    <?php
+     $sliderId      = $block->getSliderId() . uniqid('-', false);
+    $sliderIdss= $block->getSliderId();
+     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	 $productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+	$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface'); 
+
+    $categoryFactory = $objectManager->get('\Magento\Catalog\Model\CategoryFactory');
+    $category = $objectManager->get(\Magento\Framework\Registry::class)->registry('current_category');//get current category
+       $categories_id= $category->getId();
+  
+  
+
+    $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+    $connection = $resource->getConnection();
+    $sql344 = "SELECT * from mg_mageplaza_bannerslider_slider where slider_id=$sliderIdss";
+    $data_image = $connection->fetchAll($sql344);
+      $slider_cat_id= $data_image[0]['categories_id'];
+      $statuslis= $data_image[0]['status'];
+
+      if($categories_id == $slider_cat_id){
+      
+    $sliderOptions = $block->getBannerOptions(); ?>
+    <div class="carousel-container <?php if($statuslis==1){echo 'website';}else{ echo 'mobile';} ?>">
+        <div id="banner-slider-carousel">
+            <?php $iterator = 1; ?>
+            <div id="bannerslider-list-items-<?= $sliderId; ?>"
+                 class="owl-carousel owl-theme">
+                <?php foreach ($banners as $banner) : ?>
+                    <?php
+                    $bnType  = $banner->getType();
+                    $bnTitle = $banner->getTitle();
+                    $bnUrl   = $banner->getUrlBanner();
+		  			$mediaUrl='';
+		  			$pr_url='';
+		  			if($bnUrl!='')
+					{
+						try{
+						$product = $productRepository->get(trim($bnUrl));
+						$pr_url=$product->getProductUrl();
+						
+						
+							if ($product->getExtensionAttributes() && $product->getExtensionAttributes()->getDownloadableProductSamples()) {
+											foreach ($product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+												if($links->getSampleUrl()!='')
+												{
+													$mediaUrl=$links->getSampleUrl();
+												}else{
+												 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+												}
+												
+												 break;
+											}
+										}
+					
+						} catch (\Magento\Framework\Exception\NoSuchEntityException $e){
+									// insert your error handling here
+								}
+					}
+		  
+		  			
+                    $bnImg   = $banner->getImageUrl();
+                    $bnname= $banner->getName();
+                    ?>
+                    <?php if (($bnType === Type::CONTENT && empty($banner->getContent())) || ($bnType === Type::IMAGE && empty($banner->getImage()))) : continue; ?>
+                    <?php endif; ?>
+                    <?= ($iterator++ === 1) ? '<div class="banner-item banner-slider">' : '</div><div class="banner-item banner-slider">' ?>
+                    <?php if ($bnType === Type::CONTENT) : ?>
+                        <div class="item-content">
+                            <?= $block->getPageFilter($banner->getContent()); ?>
+                        </div>
+                    <?php else : #image type?>
+                        <div class="item-image">
+                            
+                                <?php if (!empty($bnTitle)) : ?>
+                                <div class="fio">
+                                    <div class="container">
+                                        <div class="banner-title">
+                                            <h2> <?= $bnname ?> </h2>
+                                        <p><?= $bnTitle ?></p>
+										 <div class="banner_action_btn__">
+                                         <?php if (!empty($bnUrl)) : ?>
+										
+                                        <a href="<?= $pr_url; ?>" <?= ($banner->getNewtab() === '1') ? 'target="_blank"' : '' ?> class="banner_btn fab-btn">Buy Now</a>
+                                         <?php endif; ?>
+											
+											 <?php
+										 if($mediaUrl!='')
+										 {
+											 ?>
+										<img class="play_music audio_play play_audio banner_play" data-mediaurl="<?php echo $mediaUrl;?>" data-music="audio5" src="https://www.fabmarket.in/pub/media/images/show-play.svg">
+										 <?php
+										 }
+										?>
+											</div>
+                                      <!--  <img src="http://cyberworx.co.in/fab_radio/images/show-play.svg">-->
+                                         </div>
+                                         </div>
+                                        </div>
+                                    <?php endif; ?>
+							<div class="pro_img" style="display:none">
+								 <img class="owl-image img-responsive" src="<?= $bnImg ?>" >
+							</div>		
+                                <img class="owl-image img-responsive" src="<?= $bnImg ?>"
+                                     title="<?= $bnTitle ?>">
+							
+                          
+                        </div>
+                        
+                        
+                        
+                    <?php endif; ?>
+                    <?= ($iterator === count($banners) + 1) ? '</div>' : '' ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?= $block->getPagerHtml() ?>
+    </div>
+
+    <script>
+        require(['jquery', 'mageplaza/core/owl.carousel'], function ($) {
+            $('#bannerslider-list-items-<?= $sliderId; ?>').owlCarousel(<?= $sliderOptions; ?>);
+        });
+    </script>
+    <?php } ?>
+<?php endif; ?>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Webkul Software.
+ *
+ * @category  Webkul
+ * @package   Webkul_Marketplace
+ * @author    Webkul
+ * @copyright Copyright (c) Webkul Software Private Limited (https://webkul.com)
+ * @license   https://store.webkul.com/license.html
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product_tabs">
+            <block class="Webkul\Marketplace\Block\Adminhtml\Product\Edit\Tab" name="product.flags">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">Product Flags</argument>
+                    <argument name="url" xsi:type="url" path="marktplace/product_flags/grid">
+                        <param name="_current">1</param>
+                    </argument>
+                    <argument name="class" xsi:type="string">ajax</argument>
+                    <argument name="group_code" xsi:type="string">advanced</argument>
+                </arguments>
+            </block>
+            <action method="addTab">
+                <argument name="name" xsi:type="string">product-flags</argument>
+                <argument name="block" xsi:type="string">product.flags</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

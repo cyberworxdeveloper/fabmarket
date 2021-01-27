@@ -1,0 +1,12 @@
+<?php
+// get current product data
+$product = $block->getProduct();
+
+
+if (!empty($product->getAttachment())) {
+
+    $attachmentUrl = $block->getProductAttachmentUrl($product->getAttachment());
+    ?>
+    <a href="<?php echo $attachmentUrl ?>" target="_blank"><?php echo $product->getAttachment() ?></a>
+<?php
+}

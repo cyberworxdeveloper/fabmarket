@@ -1,0 +1,121 @@
+<?php
+/**
+ * Copyright © 2018 Codazon, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/* $block Codazon\ShoppingCartPro\Block\MiniCart */
+?>
+
+<div class="sidebar-minicart" test id="cdz-sidebar-minicart" data-block='minicartpro'>
+<div class="sidebar_tophead_title">
+	<p>YOUR CART <a href="<?php echo $block->getBaseUrl(); ?>checkout/cart/"><img src="<?php echo $block->getBaseUrl(); ?>pub/media/images/fab_radio/cart.svg"></a></p>
+</div>
+
+    <div class="cdz-backface" data-action="close"></div>
+    <div class="sidebar-cart-inner" data-bind="scope: 'minicartpro_content'">
+        <a class="cart-trigger" data-role="cart-trigger">
+            <span class="flying-destination" data-role="flying-destination"></span>
+            <span class="summary-count-label" data-role="cart-count">
+                <!-- ko if: getCartParam('summary_count') -->
+                    <!-- ko text: getCartParam('summary_count') --><!-- /ko -->
+                <!-- /ko -->
+                <!-- ko ifnot: getCartParam('summary_count') -->
+                    <!-- ko i18n: '0' --><!-- /ko -->
+                <!-- /ko -->
+            </span>
+        </a>
+		<?php /*
+        <div class="block-minicartpro block-minicart" data-role="cart-content">
+            <div id="minicartpro-content-wrapper">
+                <!-- ko template: 'Codazon_ShoppingCartPro/minicart/content-sidebar.html' --><!-- /ko -->
+            </div>
+        </div> 
+		*/ ?>
+		<?php 
+			/*$om =   \Magento\Framework\App\ObjectManager::getInstance();
+			$cartData = $om->create('Magento\Checkout\Model\Cart')->getQuote()->getAllVisibleItems();
+			echo "==>".$cartDataCount = count( $cartData );			
+			$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+			$cart = $objectManager->get('\Magento\Checkout\Model\Cart'); 
+			//$itemsCollection = $cart->getQuote()->getItemsCollection();
+			 $items = $cart->getQuote()->getAllItems();
+			 foreach($items as $item) {
+				 echo 'ID: '.$item->getProductId().'<br />';
+				  echo 'Name: '.$item->getName().'<br />';
+				   echo 'Sku: '.$item->getSku().'<br />';
+				   echo 'Quantity: '.$item->getQty().'<br />';
+				  echo 'Price: '.$item->getPrice().'<br />';
+				echo "<br />";            
+			  }
+			  echo "working";*/
+			/*$om =   \Magento\Framework\App\ObjectManager::getInstance();
+			$cartData = $om->create('Magento\Checkout\Model\Cart')->getQuote()->getAllVisibleItems();
+			//echo $cartDataCount = count( $cartData );
+			 foreach($cartData as $item ){ 
+			
+                $product = $item->getProduct(); 
+                echo $image = $product['small_image']; //== '' ? 'default-category-image_1.png' : '/pub/media/catalog/product' . $product['small_image']; 
+				echo $product['name'];
+				echo $item->getQty();
+				//die("hi");
+            } */
+			//die("bye");
+			//$quote = $block->getQuoteData();
+			//print_r($quote->getProduct());
+			//[]die("hi");
+			
+			/*$obj = \Magento\Framework\App\ObjectManager::getInstance();
+			$quote = $obj->get('Magento\Checkout\Model\Session')->getQuote();
+			$helper = $obj->get('\Magento\Checkout\Helper\Cart');
+			$quote = $helper->getQuote();
+			$quoteitems = $quote->getAllItems();
+			$cart= $helper->getCart();
+			foreach ($quoteitems as $item)
+			{
+				$_imagehelper = $obj->get('\Magento\Catalog\Helper\Image');
+				$product = $item->getProduct();
+				echo $img = $_imagehelper->init($product,'category_page_list',array('height' => '100' , 'width'=> '100'))->getUrl();
+				echo 'ID: '.$item->getProductId().'<br/>';
+				echo 'Name: '.$item->getName().'<br/>';
+				echo 'Sku: '.$item->getSku().'<br/>';
+				echo 'Quantity: '.$item->getQty().'<br/>';
+				echo 'Price: '.$item->getPrice().'<br/>';
+				echo 'Product Type: '.$item->getProductType().'<br/>';
+				echo 'Discount: '.$item->getDiscountAmount();echo "<br/>";
+			}
+			echo "Hi";*/
+			/*$quote = $block->getQuoteData();
+			foreach($quote->getAllVisibleItems() as $_item) {
+				//echo "<pre>";print_r($_item->debug());	
+				//$_imagehelper = $obj->get('\Magento\Catalog\Helper\Image');
+				//$product = $_item->getProduct();
+				//echo $img = $_imagehelper->init($product,'category_page_list',array('height' => '100' , 'width'=> '100'))->getUrl();				
+				echo 'ID: '.$_item->getProductId().'<br/>';
+				echo 'Name: '.$_item->getName().'<br/>';
+				echo 'Sku: '.$_item->getSku().'<br/>';
+				echo 'Quantity: '.$_item->getQty().'<br/>';
+				echo 'Price: '.$_item->getPrice().'<br/>';
+				echo 'Product Type: '.$_item->getProductType().'<br/>';
+				echo 'Discount: '.$_item->getDiscountAmount();echo "<br/>";
+				echo "<br/>";
+			}*/
+		?>
+		
+    </div>
+	
+<div class="sidebar_bottom_info_box">
+
+</div>
+</div>
+
+<script type="text/x-magento-init">
+{
+	"[data-block='minicartpro']": {
+		"Magento_Ui/js/core/app": <?= $block->getJsLayout();?>
+	}
+}
+</script>
+<script type="text/javascript">	
+			
+</script>

@@ -1,0 +1,27 @@
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$product = $objectManager->get('Magento\Framework\Registry')->registry('current_product');//get current product
+$product = $objectManager->get('\Magento\Catalog\Model\Product')->load($product->getId());
+$customOptions = $objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($product);
+$special_price_title= $product->getResource()->getAttribute('special_price_title')->getFrontend()->getValue($product);
+
+?>
+<?php 
+$_finalPrice =$product->getFinalPrice();
+$_finalPrice =number_format($_finalPrice,2);
+ $price = $product->getPrice();
+ $price =number_format($price,2);
+?>
+<?php if($_finalPrice != $price  ){ ?>
+<strong class="entire-show-offer">Buy the entire show: <?php echo $special_price_title ?></strong>
+
+
+
+<p class="price"> <strike class="dis_price">$<?php echo $price?></strike> Discounted Price: $<?php echo $_finalPrice ?></p>
+
+<?php }else { ?>
+<strong class="entire-show-offer">Price: <b style="color: #cf4347;">$<?php echo $price ?></b></strong>
+
+
+
+<?php } ?>

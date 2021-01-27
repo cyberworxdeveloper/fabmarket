@@ -1,0 +1,1101 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+use Magento\Framework\App\Action\Action;
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php 
+/*Same code is used for magento 2, but I prefer you to use $this if you are working in product page or category page*/
+$pageTypes_=$this->getRequest()->getControllerName(); 
+if($pageTypes_=='category'){
+?>
+<?php if ($block->getMode() == 'grid') : ?>
+<?php
+/**
+ * Product list template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php
+$_productCollection = $block->getLoadedProductCollection();
+?>
+
+<?php if (!$_productCollection->count()): ?>
+    <div class="message info empty"><div><?= __('We can\'t find products matching the selection.') ?></div></div>
+<?php else: ?>
+<?php
+/* helper */
+$_helper = $this->helper('Magento\Catalog\Helper\Output');
+$imageHelper = $this->helper('Magento\Catalog\Helper\Image');
+$themeHelper = $this->helper('Codazon\ThemeLayoutPro\Helper\Data');
+$quickShopHelper = $this->helper('Codazon\QuickShop\Helper\Data');
+$compareHelper = $this->helper('Magento\Catalog\Helper\Product\Compare');
+$wishlistHelper = $this->helper('Magento\Wishlist\Helper\Data');
+$labelHelper = $this->helper('Codazon\ProductLabel\Helper\Data');
+
+/* layout */
+$layout = $themeHelper->getBlockPageLayout($block);
+
+/* show on list */
+$showDescription = $themeHelper->isDisplayOnList('description');
+$showSku = $themeHelper->isDisplayOnList('sku');
+$showWishlist = $themeHelper->isDisplayOnList('wishlist');
+$showCompare = $themeHelper->isDisplayOnList('compare');
+$showCart = $themeHelper->isDisplayOnList('addtocart');
+$showQuickShop = $themeHelper->isDisplayOnList('quickshop');
+$showLabel = $themeHelper->isDisplayOnList('label');
+$showThumb = $themeHelper->isDisplayOnList('thumb');
+$showName = $themeHelper->isDisplayOnList('name');
+$showReview = $themeHelper->isDisplayOnList('review');
+$showPrice = $themeHelper->isDisplayOnList('price');
+
+
+
+$width = $themeHelper->getConfig('images/category/product_image_width')?:150;
+$height = $themeHelper->getConfig('images/category/product_image_height')?:150;
+$paddingBottom = $height*100/$width;
+							
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface'); 
+$productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');							
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');							
+							
+							
+
+$cartWidget = $block->isRedirectToCartEnabled()?'':'data-mage-init=\'{"catalogAddToCart":{}}\'';
+?>
+<?php
+
+if($this->getProductPage()) {
+  echo 'this is a product page, do some stuff';
+}
+elseif($this->getCategoryPage()) {
+  echo 'this is a category page, do some stuff';
+}
+?>
+
+<style type="text/css">
+<?= $themeHelper->getColumnStyle('.page-products .products-grid.ctst .product-items', '.page-products .products-grid.ctst .product-items .item.product-item', '.page-products .ctst .product-items .item.product-item', $layout); ?>
+</style>
+    <?= $block->getToolbarHtml() ?>
+    <?= $block->getAdditionalHtml() ?>
+    <?php
+	$viewMode = 'grid';
+	$image = 'category_page_grid';
+	$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+    $pos = $block->getPositioned();
+    $qtyValidator = $block->escapeHtml(json_encode($themeHelper->getQuantityValidators()));
+    ?>
+    
+    
+    <?= $block->getToolbarHtml() ?>
+<?php endif; ?>
+<?php else : ?>
+<?php echo $this->setTemplate('Magento_Catalog::product/list/list-mode/list-02.phtml')->toHtml(); ?>
+<?php endif ?>
+
+
+
+<?php 
+
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $categoryFactory = $objectManager->get('\Magento\Catalog\Model\CategoryFactory');
+    $category = $objectManager->get(\Magento\Framework\Registry::class)->registry('current_category');//get current category
+    $categories_id= $category->getId();
+    $cat_name=$category->getName();
+?>
+
+<?php
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $catId = $categories_id; 
+    $subCategory = $objectManager->create('Magento\Catalog\Model\Category')->load($catId);
+    $subCats = $subCategory->getChildrenCategories();
+    $_helper = $this->helper('Magento\Catalog\Helper\Output');
+    $sub_cat_total=count($subCats);
+    if($sub_cat_total !='' || $sub_cat_total !='0') { ;
+?>
+<div class="custom_categories" >
+<ul class="sub-cat-ul">
+    <?php
+    $k=1;
+     foreach ($subCats as $subcat) {
+        $_category = $objectManager->create('Magento\Catalog\Model\Category')->load($subcat->getId());
+        $subcaturl = $subcat->getUrl();
+          $subcat_id= $subcat->getId();
+         ?>
+         <?php if( $k<=2){ ?>
+        <li class="cat-li">
+            <div class="info">
+                <h4 class="<?php echo $k; ?>"><?php echo $subcat->getName(); ?></h4><a class="link" href="<?php echo $subcaturl ?>"><?php /* @escapeNotVerified */ echo __('View all') ?></a>
+            </div>
+        </li>
+          <div class="product-list-container" id="product-list-container">
+        <div class="products wrapper product-list-style-18 ctst grid products-grid par-category-page">
+                 <ol class="products list items product-items flex-grid">    
+     <?php   
+$category = $categoryFactory->create()->load($subcat_id);
+$categoryProducts = $category->getProductCollection() ->addAttributeToSelect('*');
+$i=1;
+foreach ($categoryProducts as $product) {
+	$mainImage = $product->getData('small_image');
+		$hoveredImage = $product->getData('thumbnail');
+	
+	$mediaUrl='';
+	$_product = $productRepository->get($product->getSKU());
+ if ($_product->getExtensionAttributes() && $_product->getExtensionAttributes()->getDownloadableProductSamples()) {
+		foreach ($_product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+			if($links->getSampleUrl()!='')
+			{
+				$mediaUrl=$links->getSampleUrl();
+			}else{
+			 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+			}
+			
+			 break;
+		}
+	}
+	
+	
+        ?> <?php if( $i< 5){ ?>
+    <li class="item product product-item" <?php echo $i ?>>                              
+                <div class="product-item-info" data-container="product-grid">
+                                        									
+                    <div class="product-item-top"><div class="wishlist_msg">Item added to your wishlist</div>
+						<?php
+						if($mediaUrl)
+						{
+						?>
+                        <img src="pub/media/images/play-icon.svg" class="play play_audio" data-audio="<?php echo $mediaUrl;?>">
+						<?php
+						}
+							?>
+                                                 <a href="<?php echo $product->getProductUrl() ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                 <span class="product-image-wrapper" style="padding-bottom: <?= $paddingBottom ?>%;">
+                                    <img class="product-image-photo main-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($mainImage)->resize($width, $height)->getUrl() ?>" />
+                                    <img class="product-image-photo hovered-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($hoveredImage)->resize($width, $height)->getUrl() ?>" />
+                                </span>
+                            </span>
+                        </a>
+                        <?= $showQuickShop?$quickShopHelper->getQuickShopButton($product):''; ?>
+                        <?php if ($showCompare || $showWishlist) : ?>
+                        <div class="button-top-wrap">
+                        <?php if ($wishlistHelper->isAllow() && $showWishlist): ?>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+if($customerSession->isLoggedIn()) {
+ $in_wishlist = 0;
+$idsss =  $customerSession->getCustomerID();
+    $wishlist            = $objectManager->get('\Magento\Wishlist\Model\Wishlist');
+    $wishlistCollection = $wishlist->loadByCustomerId($idsss, true)->getItemCollection();    
+foreach ($wishlistCollection as $_wishlist_item) {
+  
+   if ($product->getId() == $_wishlist_item->getProduct()->getId()) {
+      $in_wishlist = 1; 
+   break;
+   }
+}
+}
+?>
+
+                            <a href="#"
+                               data-post='<?= $block->getAddToWishlistParams($product); ?>'
+                               class="action towishlist <?php if($customerSession->isLoggedIn()) { if($in_wishlist ==1){ echo 'already_in_wishlist';} } ?>" data-action="add-to-wishlist"
+                               title="<?= __('Add to Wish List') ?>">
+                                <span><?= __('Add to Wish List') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
+                            <a href="#" class="action tocompare"
+                               data-post='<?= $compareHelper->getPostDataParams($product);?>'
+                               title="<?= __('Add to Compare') ?>">
+                                <span><?= __('Add to Compare') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <?php endif ?>
+                        
+                                            </div>
+                                        <div class="product details product-item-details">
+												<strong class="product name product-item-name">
+							<a class="product-item-link" href="<?php echo $product->getProductUrl() ?>">
+							<?php 	echo $product->getName(); ?>							</a>
+						</strong>
+												<div class="product description product-item-description">
+							<?= $themeHelper->subString($_helper->productAttribute($product, $product->getShortDescription(), 'short_description'), 70) ?>
+						</div>
+												
+							<?= $showPrice?$block->getProductPrice($product):''; ?>								
+                        <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									<button type="submit" title="<?= $block->escapeHtml(__('Add to Cart')); ?>" class="action tocart primary">
+										<span><?= __('Add to Cart') ?></span>
+									</button>
+								</form>
+							<?php else: ?>
+								<?php if ($product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                                            </div>
+                </div>
+                </li>                
+<?php $i++; } }
+
+  ?>      
+ </ol>
+    </div>
+            
+      </div>          
+     <?php $k++; }  ?>
+     <?php   ?>
+     <?php  } ?> 
+
+</ul>
+</div>
+
+
+<div class="container-fluid fab_section">
+   <div class="fab_single_banner">
+      <!--<a href="#"><img src="pub/media/images/tamil-hits.jpg"></a>-->
+	   
+	<?php 
+		$category = $categoryFactory->create()->load($categories_id);										 
+	   $_outputhelper    = $this->helper('Magento\Catalog\Helper\Output');
+
+    $_imgHtml   = '';
+    if ($_imgUrl = $category->getImageUrl()) {
+
+       $_imgHtml = '<img src="' . $_imgUrl . '" height="240px!important" />';
+    $_imgHtml = $_outputhelper->categoryAttribute($category, $_imgHtml, 'image');
+    /* @escapeNotVerified */ 
+    echo $_imgHtml;
+		
+}
+?>	   
+	   
+	   
+   </div>
+</div>
+<!---------------------->
+<?php
+													 
+	//echo "fghgh ".$categories_id;												 
+
+$categoryProducts__ = $category->getProductCollection() ->addAttributeToSelect('*');
+													 
+$m=1;
+if(count($categoryProducts__)>0):	
+try {													 
+foreach ($categoryProducts__ as $_product) {
+    $featured_show= $_product->getResource()->getAttribute('featured_show')->getFrontend()->getValue($_product);
+	
+    if($m <2 && $featured_show=="Yes"){
+		
+	    $mainImage_ = $_product->getData('small_image');
+		$hoveredImage_ = $_product->getData('thumbnail');
+		
+	$product = $productRepository->get($_product->getSKU());			
+$mediaUrl='';
+
+ if ($product->getExtensionAttributes() && $product->getExtensionAttributes()->getDownloadableProductSamples()) {
+		foreach ($product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+			if($links->getSampleUrl()!='')
+			{
+				$mediaUrl=$links->getSampleUrl();
+			}else{
+			 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+			}
+			
+			 break;
+		}
+	}
+	
+?>
+<div class="fab_section featured_section_main">
+   <h2 class="fab_main_heading text-left">Featured <?php echo $cat_name;?></h2>
+   <div class="row">
+      <div class="col-md-12">
+         <div class="fab_product_block">
+            <div class="img_box featured_img">
+               <span class="fab_wishlish"><i class="fa fa-heart-o"></i></span>
+<?php
+			if($mediaUrl)
+			{
+			?>
+				<img src="pub/media/images/play-icon.svg" class="play play_audio" data-audio="<?php echo $mediaUrl;?>">
+			<?php
+			}
+				?> <a href="<?php echo $_product->getProductUrl() ?>"> <img src="<?php echo $imageHelper->init($_product, $image)->setImageFile($mainImage_)->resize($width, $height)->getUrl() ?>"> </a>
+               <!--<p>Bollywood Top 20</p>-->
+            </div>
+         </div>
+      </div>
+      <div class="col-md-12">
+         <div class="fab_featured_show fab_product_block">
+            <h3 class="fab_flex_left"><?php	echo $_product->getName(); ?></h3>
+            <a href="<?php echo $_product->getProductUrl() ?>" class="btn_all fab_flex_right">View All <i class="fa fa-angle-right"></i></a>
+            <div class="content">
+             <p>	<?= $themeHelper->subString($_helper->productAttribute($_product, $_product->getShortDescription(), 'short_description'), 90) ?></p>
+               <!--<button type="button" class="play_music"><i class="fa fa-play"></i>Preview Sample</button>-->
+				<?php
+			if($mediaUrl)
+			{
+			?>
+              <button type="button" class="play_music audio_play sample_music" data-mediaurl="<?php echo $mediaUrl; ?>" data-music="audio5"><i class="fa fa-play"></i>Preview Sample</button>
+				<?php
+			}
+		?>
+               <div class="starting">
+                  <p>Starting at <span>$ <?php echo number_format((float)$_product->getPrice(), 2, '.', '') ?></span> </p>
+                  <div class="fab_addtocart">
+                    
+                 
+                  <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($_product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($_product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty" style="display: none;">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($_product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									
+									<button type="submit"  class="action tocart primary">
+									 <tooltip>Add to Cart</tooltip>
+                                    <img src="pub/media/images/fab_radio/redcart.svg">
+									</button>
+									
+								</form>
+							<?php else: ?>
+								<?php if ($_product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $_product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                         </div>
+               </div>
+               <hr>
+               <?php
+
+   
+$productss = $objectManager->get('\Magento\Catalog\Model\Product')->load($_product->getId());
+
+               $customOptions = $objectManager->get('Magento\Catalog\Model\Product\Option')->getProductOptionCollection($productss);
+               
+
+	$opt=$customOptions->getData();
+
+if(count($customOptions)>0)
+{ ?>
+               <ul class="music_play_list">
+                <?php
+                 $ik=1;
+                foreach ($customOptions as $option) {
+                 
+                   	foreach ($option->getValues() as $value) { 
+						
+                   	    	$val=$value->getData();
+						
+                            	
+								try {
+									$productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository');
+									$product = $productRepository->get($val['sku']);
+									?>
+				   
+				   						 <li>
+										 <span class="music_time"><?php 
+											$episode_duration= $product->getResource()->getAttribute('episode_duration')->getFrontend()->getValue($product); 
+											if($episode_duration>0)
+												echo $episode_duration.' Mins';
+											 ?></span>
+										 <span class="music_name">
+											<span class="bold">
+											   <?php echo $product->getName();?> 
+											   <p>
+												<?= $themeHelper->subString($_helper->productAttribute($product, $product->getShortDescription(), 'short_description'), 180) ?></p>
+											</span>
+										 </span>
+									  </li>
+				   
+				   
+				   					<?php
+								} catch (\Exception $exception) {
+									//throw new \Magento\Framework\Exception\NoSuchEntityException(__('Such product doesn\'t exist'));
+								}
+						
+                 ?>
+                 
+				   
+                <?php $ik++; } }  ?>
+               </ul>
+               <?php } ?>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+
+<?php
+$m++; }}
+}catch (\Magento\Framework\Exception\NoSuchEntityException $e){
+	// insert your error handling here
+}
+endif;	
+													 
+													 
+													 
+        ?>
+
+
+<!--------------------------------------------->
+<div class="container-fluid fab_section">
+   <div class="fab_single_banner">
+     <!-- <a href="#"><img src="http://www.rupinwadhwa.com/fab2/pub/media/images/weekend-class.jpg"></a>-->
+	   <?php 
+	if ($_description =$category->getDescription()): ?>
+        <?php /* @escapeNotVerified */ echo $this->helper('Magento\Catalog\Helper\Output')->categoryAttribute($category, $_description, 'description') ?>
+	<?php endif; ?>
+	  
+   </div>
+</div>
+
+
+
+<div class="custom_categories" >
+<ul class="sub-cat-ul">
+    <?php
+    $kk=1;
+     foreach ($subCats as $kkk=>$subcat) {
+        $_category = $objectManager->create('Magento\Catalog\Model\Category')->load($subcat->getId());
+        $subcaturl = $subcat->getUrl();
+          $subcat_id= $subcat->getId();
+         ?>
+     <?php
+         
+      if($kk == 3 || $kk >= 4){ ?>
+        <li class="cat-li">
+            <div class="info">
+                <h4 class="<?php echo $kk; ?>"><?php echo $subcat->getName(); ?></h4><a class="link" href="<?php echo $subcaturl ?>"><?php /* @escapeNotVerified */ echo __('View all') ?></a>
+            </div>
+        </li>
+          <div class="product-list-container" id="product-list-container">
+        <div class="products wrapper product-list-style-18 ctst grid products-grid">
+                 <ol class="products list items product-items flex-grid">    
+     <?php   
+    $category = $categoryFactory->create()->load($subcat_id);
+    $categoryProducts = $category->getProductCollection() ->addAttributeToSelect('*');
+     $i=1;
+      foreach ($categoryProducts as $product) {
+    	$mainImage = $product->getData('small_image');
+		$hoveredImage = $product->getData('thumbnail');
+		  
+		  
+		  $_product = $productRepository->get($product->getSKU());
+		  
+		  $mediaUrl='';
+
+ if ($_product->getExtensionAttributes() && $_product->getExtensionAttributes()->getDownloadableProductSamples()) {
+		foreach ($_product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+			if($links->getSampleUrl()!='')
+			{
+				$mediaUrl=$links->getSampleUrl();
+			}else{
+			 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+			}
+			
+			 break;
+		}
+	}
+
+		
+        ?> <?php if( $i< 5){ ?>
+            <li class="item product product-item" <?php echo $i ?>>                              
+                <div class="product-item-info" data-container="product-grid">
+                                        									
+                    <div class="product-item-top"><div class="wishlist_msg">Item added to your wishlist</div>
+                        <?php
+			if($mediaUrl)
+			{
+			?>
+				<img src="pub/media/images/play-icon.svg" class="play play_audio" data-audio="<?php echo $mediaUrl;?>">
+			<?php
+			}
+				?>
+
+                                                 <a href="<?php echo $product->getProductUrl() ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                 <span class="product-image-wrapper" style="padding-bottom: <?= $paddingBottom ?>%;">
+                                    <img class="product-image-photo main-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($mainImage)->resize($width, $height)->getUrl() ?>" />
+                                    <img class="product-image-photo hovered-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($hoveredImage)->resize($width, $height)->getUrl() ?>" />
+                                </span>
+                            </span>
+                        </a>
+                        <?= $showQuickShop?$quickShopHelper->getQuickShopButton($product):''; ?>
+                        <?php if ($showCompare || $showWishlist) : ?>
+                        <div class="button-top-wrap">
+                        <?php if ($wishlistHelper->isAllow() && $showWishlist): ?>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+if($customerSession->isLoggedIn()) {
+  $in_wishlist = 0;
+$idsss =  $customerSession->getCustomerID();
+    $wishlist            = $objectManager->get('\Magento\Wishlist\Model\Wishlist');
+    $wishlistCollection = $wishlist->loadByCustomerId($idsss, true)->getItemCollection();    
+foreach ($wishlistCollection as $_wishlist_item) {
+ 
+   if ($product->getId() == $_wishlist_item->getProduct()->getId()) {
+      $in_wishlist = 1; 
+   break;
+   }
+}
+}
+?>
+
+
+                            <a href="#"
+                               data-post='<?= $block->getAddToWishlistParams($product); ?>'
+                               class="action towishlist <?php if($customerSession->isLoggedIn()) { if($in_wishlist ==1){ echo 'already_in_wishlist';} } ?>" data-action="add-to-wishlist"
+                               title="<?= __('Add to Wish List') ?>">
+                                <span><?= __('Add to Wish List') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
+                            <a href="#" class="action tocompare"
+                               data-post='<?= $compareHelper->getPostDataParams($product);?>'
+                               title="<?= __('Add to Compare') ?>">
+                                <span><?= __('Add to Compare') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <?php endif ?>
+                        
+                                            </div>
+                                        <div class="product details product-item-details">
+												<strong class="product name product-item-name">
+							<a class="product-item-link" href="<?php echo $product->getProductUrl() ?>">
+							<?php 	echo $product->getName(); ?>							</a>
+						</strong>
+												<div class="product description product-item-description">
+							<?= $themeHelper->subString($_helper->productAttribute($product, $product->getShortDescription(), 'short_description'), 70) ?>
+						</div>
+												
+							<?= $showPrice?$block->getProductPrice($product):''; ?>								
+                        <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									<button type="submit" title="<?= $block->escapeHtml(__('Add to Cart')); ?>" class="action tocart primary">
+										<span><?= __('Add to Cart') ?></span>
+									</button>
+								</form>
+							<?php else: ?>
+								<?php if ($product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                                            </div>
+                </div>
+                </li>                
+<?php $i++; } }
+
+  ?>      
+ </ol>
+    </div>
+            
+      </div>          
+     <?php  }  $kk++;?>
+     <?php   ?>
+     <?php  } ?> 
+
+</ul>
+</div>
+
+
+
+<?php } else {?>
+ <div class="product-list-container" id="product-list-container">
+        <div class="products wrapper product-list-style-18 ctst grid products-grid sub-category-page">
+            <div class="info">
+               <h4 class="title"><?php echo $category->getName(); ?></h4>
+            </div>
+                 <ol class="products list items product-items flex-grid">
+     <?php   
+        $category = $categoryFactory->create()->load($categories_id);
+ 
+$categoryProducts = $category->getProductCollection()
+                             ->addAttributeToSelect('*');
+                             
+foreach ($categoryProducts as $product) {
+	$mainImage = $product->getData('small_image');
+						$hoveredImage = $product->getData('thumbnail');
+	
+	$mediaUrl='';
+	
+	$_product = $productRepository->get($product->getSKU());
+
+ if ($_product->getExtensionAttributes() && $_product->getExtensionAttributes()->getDownloadableProductSamples()) {
+		foreach ($_product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+			if($links->getSampleUrl()!='')
+			{
+				$mediaUrl=$links->getSampleUrl();
+			}else{
+			 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+			}
+			
+			 break;
+		}
+	}
+
+  
+  ?>       
+            
+           
+                            <li class="item product product-item">                              
+                <div class="product-item-info" data-container="product-grid">
+                                        									
+                    <div class="product-item-top"><div class="wishlist_msg">Item added to your wishlist</div>
+                         <?php
+						if($mediaUrl)
+						{
+						?>
+							<img src="pub/media/images/play-icon.svg" class="play play_audio" data-audio="<?php echo $mediaUrl;?>">
+						<?php
+						}
+							?>
+
+                                                 <a href="<?php echo $product->getProductUrl() ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                 <span class="product-image-wrapper" style="padding-bottom: <?= $paddingBottom ?>%;">
+                                    <img class="product-image-photo main-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($mainImage)->resize($width, $height)->getUrl() ?>" />
+                                    <img class="product-image-photo hovered-img" src="<?php echo $imageHelper->init($product, $image)->setImageFile($hoveredImage)->resize($width, $height)->getUrl() ?>" />
+                                </span>
+                            </span>
+                        </a>
+                        <?= $showQuickShop?$quickShopHelper->getQuickShopButton($product):''; ?>
+                        <?php if ($showCompare || $showWishlist) : ?>
+                        <div class="button-top-wrap">
+                        <?php if ($wishlistHelper->isAllow() && $showWishlist): ?>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+if($customerSession->isLoggedIn()) {
+  $in_wishlist = 0;
+$idsss =  $customerSession->getCustomerID();
+    $wishlist            = $objectManager->get('\Magento\Wishlist\Model\Wishlist');
+    $wishlistCollection = $wishlist->loadByCustomerId($idsss, true)->getItemCollection();    
+foreach ($wishlistCollection as $_wishlist_item) {
+ 
+   if ($product->getId() == $_wishlist_item->getProduct()->getId()) {
+      $in_wishlist = 1; 
+   break;
+   }
+}
+}
+?>
+
+
+                            <a href="#"
+                               data-post='<?= $block->getAddToWishlistParams($product); ?>'
+                               class="action towishlist <?php if($customerSession->isLoggedIn()) { if($in_wishlist ==1){ echo 'already_in_wishlist';} } ?>" data-action="add-to-wishlist"
+                               title="<?= __('Add to Wish List') ?>">
+                                <span><?= __('Add to Wish List') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
+                            <a href="#" class="action tocompare"
+                               data-post='<?= $compareHelper->getPostDataParams($product);?>'
+                               title="<?= __('Add to Compare') ?>">
+                                <span><?= __('Add to Compare') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <?php endif ?>
+                        
+                                            </div>
+                                        <div class="product details product-item-details">
+												<strong class="product name product-item-name">
+							<a class="product-item-link" href="<?php echo $product->getProductUrl() ?>">
+							<?php 	echo $product->getName(); ?>							</a>
+						</strong>
+												<div class="product description product-item-description">
+							<?= $themeHelper->subString($_helper->productAttribute($product, $product->getShortDescription(), 'short_description'), 70) ?>
+						</div>
+												
+							<?= $showPrice?$block->getProductPrice($product):''; ?>								
+                        <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									<button type="submit" title="<?= $block->escapeHtml(__('Add to Cart')); ?>" class="action tocart primary">
+										<span><?= __('Add to Cart') ?></span>
+									</button>
+								</form>
+							<?php else: ?>
+								<?php if ($product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                                            </div>
+                </div>
+                </li>                   
+  
+<?php }
+  ?>  
+  </ol>
+    </div>
+            
+
+      </div>
+      <?php } ?>
+  <!-- CATEGORY paGE eND -->    
+      <?php } else { ?>
+      
+     <?php if ($block->getMode() == 'grid') : ?>
+<?php
+/**
+ * Product list template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php
+$_productCollection = $block->getLoadedProductCollection();
+?>
+
+<?php if (!$_productCollection->count()): ?>
+    <div class="message info empty"><div><?= __('We can\'t find products matching the selection.') ?></div></div>
+<?php else: ?>
+<?php
+/* helper */
+$_helper = $this->helper('Magento\Catalog\Helper\Output');
+$imageHelper = $this->helper('Magento\Catalog\Helper\Image');
+$themeHelper = $this->helper('Codazon\ThemeLayoutPro\Helper\Data');
+$quickShopHelper = $this->helper('Codazon\QuickShop\Helper\Data');
+$compareHelper = $this->helper('Magento\Catalog\Helper\Product\Compare');
+$wishlistHelper = $this->helper('Magento\Wishlist\Helper\Data');
+$labelHelper = $this->helper('Codazon\ProductLabel\Helper\Data');
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();						
+
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+							
+/* layout */
+$layout = $themeHelper->getBlockPageLayout($block);
+
+/* show on list */
+$showDescription = $themeHelper->isDisplayOnList('description');
+$showSku = $themeHelper->isDisplayOnList('sku');
+$showWishlist = $themeHelper->isDisplayOnList('wishlist');
+$showCompare = $themeHelper->isDisplayOnList('compare');
+$showCart = $themeHelper->isDisplayOnList('addtocart');
+$showQuickShop = $themeHelper->isDisplayOnList('quickshop');
+$showLabel = $themeHelper->isDisplayOnList('label');
+$showThumb = $themeHelper->isDisplayOnList('thumb');
+$showName = $themeHelper->isDisplayOnList('name');
+$showReview = $themeHelper->isDisplayOnList('review');
+$showPrice = $themeHelper->isDisplayOnList('price');
+
+
+
+$width = $themeHelper->getConfig('images/category/product_image_width')?:150;
+$height = $themeHelper->getConfig('images/category/product_image_height')?:150;
+$paddingBottom = $height*100/$width;
+
+$cartWidget = $block->isRedirectToCartEnabled()?'':'data-mage-init=\'{"catalogAddToCart":{}}\'';
+?>
+<style type="text/css">
+<?= $themeHelper->getColumnStyle('.page-products .products-grid.ctst .product-items', '.page-products .products-grid.ctst .product-items .item.product-item', '.page-products .ctst .product-items .item.product-item', $layout); ?>
+</style>
+    <?= $block->getToolbarHtml() ?>
+    <?= $block->getAdditionalHtml() ?>
+    <?php
+	$viewMode = 'grid';
+	$image = 'category_page_grid';
+	$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+    $pos = $block->getPositioned();
+    $qtyValidator = $block->escapeHtml(json_encode($themeHelper->getQuantityValidators()));
+	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$storeManager = $objectManager->get('Magento\Store\Model\StoreManagerInterface'); 
+$productRepository = $objectManager->get('\Magento\Catalog\Model\ProductRepository'); 				
+    ?>
+	
+    <div class="products wrapper product-list-style-18 ctst <?= $viewMode ?> products-<?= $viewMode ?>">
+        <?php $iterator = 1; ?>
+        <ol class="products list items product-items flex-grid">
+            <?php foreach ($_productCollection as $_product): ?>
+				<?php
+					$product = $objectManager->get('Magento\Catalog\Model\Product')->load($_product->getId());
+					$product_detail_type= $product->getResource()->getAttribute('product_detail_type')->getFrontend()->getValue($product); 
+					?>
+                <?= ($iterator++ == 1) ? '<li class="item product product-item  '.$product_detail_type.'">' : '</li><li class="item product product-item '.$product_detail_type.'">' ?>
+                <div class="product-item-info <?php echo $product_detail_type;?>" data-container="product-grid">
+                    <?php if ($showThumb) : ?>
+                    <?php
+						$mainImage = $_product->getData('small_image');
+						$hoveredImage = $_product->getData('thumbnail');
+                    ?>
+					<?= $showLabel?$labelHelper->showLabel($_product):''; ?>
+                    <div class="product-item-top">
+
+                     <?php
+$mediaUrl='';
+ $product_types_cust= $_product->getTypeId() ?>
+                        	<?php if($product_types_cust =="downloadable" ){ 
+$product = $productRepository->get($_product->getSku());
+								
+									 if ($product->getExtensionAttributes() && $product->getExtensionAttributes()->getDownloadableProductSamples()) {
+											foreach ($product->getExtensionAttributes()->getDownloadableProductSamples() as $links) {
+												if($links->getSampleUrl()!='')
+												{
+													$mediaUrl=$links->getSampleUrl();
+												}else{
+												 $mediaUrl= $storeManager->getStore()->getUrl('downloadable/download/sample/', array('sample_id' => $links->getSampleId(), '_secure' => true));
+												}
+												
+												 break;
+											}
+										}
+
+?>
+<img src="/pub/media/images/play-icon.svg" class="play play_audio" data-audio="<?php echo $mediaUrl;?>">
+							
+
+                         <?php } ?>
+
+
+                        <a href="<?= $_product->getProductUrl() ?>" class="product photo product-item-photo">
+                            <span class="product-image-container">
+                                <span class="product-image-wrapper" style="padding-bottom: <?= $paddingBottom ?>%;">
+                                    <img class="product-image-photo main-img" src="<?php echo $imageHelper->init($_product, $image)->setImageFile($mainImage)->resize($width, $height)->getUrl() ?>" />
+                                    <img class="product-image-photo hovered-img" src="<?php echo $imageHelper->init($_product, $image)->setImageFile($hoveredImage)->resize($width, $height)->getUrl() ?>" />
+                                </span>
+                            </span>
+                        </a>
+                        <?= $showQuickShop?$quickShopHelper->getQuickShopButton($_product):''; ?>
+                        <?php if ($showCompare || $showWishlist) : ?>
+                        <div class="button-top-wrap">
+                        <?php if ($wishlistHelper->isAllow() && $showWishlist): ?>
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$customerSession = $objectManager->get('Magento\Customer\Model\Session');
+if($customerSession->isLoggedIn()) {
+$in_wishlist = 0;
+$idsss =  $customerSession->getCustomerID();
+    $wishlist            = $objectManager->get('\Magento\Wishlist\Model\Wishlist');
+    $wishlistCollection = $wishlist->loadByCustomerId($idsss, true)->getItemCollection();    
+foreach ($wishlistCollection as $_wishlist_item) {
+   
+   if ($_product->getId() == $_wishlist_item->getProduct()->getId()) {
+      $in_wishlist = 1; 
+   break;
+   }
+}
+}
+?>
+
+                            <a href="#"
+                               data-post='<?= $block->getAddToWishlistParams($_product); ?>'
+                               class="action towishlist <?php if($customerSession->isLoggedIn()) { if($in_wishlist ==1){ echo 'already_in_wishlist';} } ?>" data-action="add-to-wishlist"
+                               title="<?= __('Add to Wish List') ?>">
+                                <span><?= __('Add to Wish List') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
+                            <a href="#" class="action tocompare"
+                               data-post='<?= $compareHelper->getPostDataParams($_product);?>'
+                               title="<?= __('Add to Compare') ?>">
+                                <span><?= __('Add to Compare') ?></span>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <?php endif ?>
+                    </div>
+                    <?php endif ?>
+                    <div class="product details product-item-details">
+						<?php if ($showName): ?>
+						<strong class="product name product-item-name">
+							<a class="product-item-link" href="<?= $_product->getProductUrl(); ?>">
+								<?= $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
+							</a>
+						</strong>
+						<?php if ($showDescription):?>
+						<div class="product description product-item-description">
+							<?= $themeHelper->subString($_helper->productAttribute($_product, $_product->getShortDescription(), 'short_description'), 70) ?>
+						</div>
+						<?php endif; ?>
+						
+						<?php endif ?>
+                        <?php if ($showSku) : ?>
+						<div class="product-item-sku"><span class="label"><?= __('SKU: ') ?></span><span class="value"><?= $_product->getData('sku') ?></span></div>
+						<?php endif ?>
+						<?= $showReview?$block->getReviewsSummaryHtml($_product, $templateType):''; ?>
+						<?= $showPrice?$block->getProductPrice($_product):''; ?>
+						<?php echo $block->getProductDetailsHtml($_product); ?>
+						
+                        <?php if ($showCart) : ?>
+						<div class="button-wrap">
+							<div class="cart-qty">
+							<?php if ($_product->isSaleable()): ?>
+								<?php $postParams = $block->getAddToCartPostParams($_product); ?>
+								<form <?= $cartWidget ?> data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>" data-role="tocart-form" action="<?= $postParams['action']; ?>" method="post">
+									<input type="hidden" name="product" value="<?= $postParams['data']['product']; ?>">
+									<input type="hidden" name="<?= Action::PARAM_NAME_URL_ENCODED; ?>" value="<?= $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+									<?php echo $block->getBlockHtml('formkey')?>
+									<div class="field qty">
+										<label class="label" for="qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></label>
+										<div class="control">
+											<div class="qty-ctl">
+												<button title="<?= __('Decrease') ?>" type="button" data-role="change_cart_qty" class="decrease" data-qty="-1" class="decrease"></button>
+											</div>
+											<input type="number" class="qty" name="qty" maxlength="12" value="<?= $themeHelper->getProductDefaultQty($_product, $block) * 1 ?>" title="<?php echo __('Qty') ?>" class="input-text qty" data-validate="<?= $qtyValidator ?>" />
+											<div class="qty-ctl">
+												<button title="<?= __('Increase') ?>" type="button" data-role="change_cart_qty" data-qty="1" class="increase"></button>
+											</div>
+										</div>
+									</div>
+									<button type="submit" title="<?= $block->escapeHtml(__('Add to Cart')); ?>" class="action tocart primary">
+										<span><?= __('Add to Cart') ?></span>
+									</button>
+								</form>
+							<?php else: ?>
+								<?php if ($_product->getIsSalable()): ?>
+									<button onclick="document.location.href = '<?= $_product->getProductUrl(); ?>'" class="action tocart primary stock available"><span><?= __('In stock') ?></span></button>
+								<?php else: ?>
+									<button class="action tocart primary disabled stock unavailable" disabled><span><?= __('Out of stock') ?></span></button>
+								<?php endif; ?>
+							<?php endif; ?>
+							</div>
+						</div>
+                        <?php endif ?>
+                    </div>
+                </div>
+                <?= ($iterator == count($_productCollection)+1) ? '</li>' : '' ?>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+    <?= $block->getToolbarHtml() ?>
+<?php endif; ?>
+<?php else : ?>
+<?php echo $this->setTemplate('Magento_Catalog::product/list/list-mode/list-02.phtml')->toHtml(); ?>
+<?php endif ?> 
+      
+      
+      <?php } ?>
+
+<script>
+	
+	require([
+    'jquery',
+    'domReady!'
+], function ($) {
+			$(".filter-options-content-inner .items .item a" ).each(function() {
+				var verificaHorario = $( this ).data('id');
+				var htm=$('#'+verificaHorario).html();
+				 if(typeof(htm)  === "undefined") 
+				 {
+					$(this).parent().hide();
+				 }
+
+
+		  });
+});
+	
+	
+                </script>
+      
+
+         
+

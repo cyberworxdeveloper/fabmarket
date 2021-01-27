@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Vgroup65\Testimonial\Api\Data\ListInterface" type="Vgroup65\Testimonial\Model\Testimonial" />
+ 
+    <virtualType name="Vgroup65\Testimonial\Model\ResourceModel\Testimonial\Testimonial\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">vgroup_testimonial</argument>
+            <argument name="resourceModel" xsi:type="string">Vgroup65\Testimonial\Model\ResourceModel\Testimonial</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="testimonial_list_data_source" xsi:type="string">Vgroup65\Testimonial\Model\ResourceModel\Testimonial\Testimonial\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
